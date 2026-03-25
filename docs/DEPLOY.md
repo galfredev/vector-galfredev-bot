@@ -1,22 +1,82 @@
 # Deploy
 
-## VPS recomendado
+Guia pensada para un VPS Linux con OpenClaw y `n8n`.
+
+## Perfil recomendado
 
 - Ubuntu 24.04
 - Node 22
-- OpenClaw instalado en `/opt/galfre-bot`
-- `n8n` corriendo en el mismo servidor o en otro host accesible
+- OpenClaw instalado por usuario dedicado
+- `n8n` en el mismo VPS o accesible por red
+- `systemd` para mantener el gateway arriba
 
-## Pasos base
+## Layout sugerido
 
-1. Instalar OpenClaw en el servidor.
-2. Copiar `workspace/` a `~/.openclaw/workspace/`.
-3. Copiar `hooks/lead-crm/` a `~/.openclaw/hooks/lead-crm/`.
-4. Crear `~/.openclaw/openclaw.json` a partir de `config/openclaw.example.json`.
-5. Completar `LEAD_DESTINATION`, `N8N_WEBHOOK_URL` y `gateway.auth.token`.
-6. Importar `workflows/n8n/galfredev-leads.workflow.json` en `n8n`.
-7. Instalar y habilitar el servicio `systemd` de ejemplo.
-8. Relinkear WhatsApp con `openclaw channels login --channel whatsapp`.
+Ejemplo de estructura en servidor:
+
+```text
+/opt/galfre-bot/
+  .local/bin/openclaw
+  .openclaw/
+    openclaw.json
+    workspace/
+    hooks/
+    credentials/
+```
+
+## Paso a paso
+
+### 1. Instalar OpenClaw
+
+Instalar OpenClaw en el servidor segun la documentacion oficial.
+
+### 2. Crear el estado inicial
+
+Copiar desde este repo:
+
+- `workspace/` -> `~/.openclaw/workspace/`
+- `hooks/lead-crm/` -> `~/.openclaw/hooks/lead-crm/`
+
+### 3. Crear configuracion
+
+Tomar como base:
+
+- [`../config/openclaw.example.json`](../config/openclaw.example.json)
+
+Completar especialmente:
+
+- `gateway.auth.token`
+- `hooks.internal.entries.lead-crm.env.LEAD_DESTINATION`
+- `hooks.internal.entries.lead-crm.env.N8N_WEBHOOK_URL`
+
+### 4. Importar el workflow de n8n
+
+Importar:
+
+- [`../workflows/n8n/galfredev-leads.workflow.json`](../workflows/n8n/galfredev-leads.workflow.json)
+
+Y dejarlo activo o publicado.
+
+### 5. Enlazar WhatsApp
+
+```bash
+openclaw channels login --channel whatsapp
+```
+
+### 6. Instalar el servicio
+
+Usar como base:
+
+- [`../deploy/openclaw-galfre.service.example`](../deploy/openclaw-galfre.service.example)
+
+Ejemplo:
+
+```bash
+sudo cp deploy/openclaw-galfre.service.example /etc/systemd/system/openclaw-galfre.service
+sudo systemctl daemon-reload
+sudo systemctl enable openclaw-galfre.service
+sudo systemctl start openclaw-galfre.service
+```
 
 ## Comandos utiles
 
@@ -25,7 +85,19 @@ systemctl status openclaw-galfre.service
 journalctl -u openclaw-galfre.service -n 100 --no-pager
 openclaw channels status
 openclaw channels login --channel whatsapp
+openclaw channels logout --channel whatsapp
 ```
+
+## Checklist de validacion
+
+Despues del deploy:
+
+1. verificar que el servicio este `active (running)`
+2. verificar `openclaw channels status`
+3. probar saludo inicial
+4. probar un lead real
+5. probar audio o imagen
+6. confirmar que el webhook de `n8n` recibe el lead
 
 ## Notas de seguridad
 
@@ -33,3 +105,4 @@ openclaw channels login --channel whatsapp
 - No publiques `auth-profiles.json`.
 - No publiques `openclaw.json` real con tokens.
 - No publiques logs, media ni registros reales de leads.
+- No reutilices el mismo token de gateway en entornos distintos.

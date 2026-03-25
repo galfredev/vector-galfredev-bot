@@ -1,17 +1,33 @@
 # Publicacion en GitHub
 
-Este repo ya esta preparado para publicarse sin subir secretos.
+Esta guia resume como compartir el proyecto sin exponer el runtime real del bot.
 
-## Antes de hacer push
+## Que si va al repo
 
-Revisa que no se agreguen estos paths:
+- prompts
+- memoria del agente
+- hooks
+- scripts
+- workflows
+- configuraciones de ejemplo
+- documentacion
+
+## Que no va al repo
 
 - `.openclaw/`
 - `.codex-stage/`
 - `config.env`
 - cualquier `openclaw.json` real
-- cualquier carpeta `credentials/`
+- carpetas `credentials/`
+- `auth-profiles.json`
 - logs, media o leads reales
+
+## Checklist previa al push
+
+1. revisar `git status`
+2. confirmar que `.gitignore` excluye runtime y secretos
+3. dejar solo archivos de ejemplo en `config/`
+4. evitar numeros privados o tokens reales en docs
 
 ## Flujo sugerido
 
@@ -25,8 +41,9 @@ git remote add origin <TU_REPO_GITHUB>
 git push -u origin main
 ```
 
-## Si vas a compartirlo publicamente
+## Recomendaciones
 
-- deja solo `config/openclaw.example.json`
-- deja `.env.example`
-- mantene fuera del repo cualquier numero privado, token o sesion real
+- usa `openclaw.example.json`, no `openclaw.json` real
+- usa `.env.example`, no `.env` real
+- si publicas el repo, asumi que cualquier dato commiteado se vuelve visible
+- antes de cada push importante, revisa diff y status
