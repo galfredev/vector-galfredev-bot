@@ -1,0 +1,83 @@
+{
+  "name": "GalfreDev Leads Intake",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "galfredev-leads",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "WebhookLeadIn",
+      "name": "Lead Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "galfredev-leads"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "lead_payload", "name": "lead_payload", "value": "={{ $json }}", "type": "object" },
+            { "id": "received_at", "name": "received_at", "value": "={{ $now }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "SetMeta",
+      "name": "Set Metadata",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, crm: 'galfredev-leads', receivedAt: $json.received_at } }}",
+        "options": {}
+      },
+      "id": "RespondOK",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [780, 300]
+    }
+  ],
+  "connections": {
+    "Lead Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Metadata": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  },
+  "pinData": {},
+  "meta": null,
+  "active": true,
+  "versionId": "galfredev-leads-v1",
+  "tags": []
+}

@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.3.23-1"
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "openai-codex/gpt-5.4"
+      },
+      "models": {
+        "openai-codex/gpt-5.4": {},
+        "openai-codex/gpt-5.4-mini": {},
+        "groq/llama-3.1-8b-instant": {}
+      },
+      "workspace": "/opt/galfre-bot/.openclaw/workspace"
+    },
+    "list": [
+      {
+        "id": "main",
+        "name": "main",
+        "workspace": "/opt/galfre-bot/.openclaw/workspace",
+        "agentDir": "/opt/galfre-bot/.openclaw/agents/main/agent",
+        "tools": {
+          "deny": [
+            "group:web",
+            "browser",
+            "exec",
+            "process",
+            "write",
+            "edit",
+            "apply_patch"
+          ]
+        }
+      }
+    ]
+  },
+  "tools": {
+    "deny": [
+      "group:web",
+      "browser",
+      "exec",
+      "process",
+      "write",
+      "edit",
+      "apply_patch"
+    ],
+    "fs": {
+      "workspaceOnly": true
+    },
+    "media": {
+      "image": {
+        "enabled": true,
+        "maxBytes": 10485760,
+        "maxChars": 500,
+        "attachments": {
+          "mode": "all",
+          "maxAttachments": 3
+        }
+      },
+      "audio": {
+        "enabled": true,
+        "maxBytes": 20971520
+      }
+    },
+    "web": {
+      "search": {
+        "enabled": false,
+        "provider": "duckduckgo"
+      }
+    }
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "channels": {
+    "whatsapp": {
+      "enabled": true,
+      "dmPolicy": "open",
+      "allowFrom": [
+        "*"
+      ],
+      "selfChatMode": true,
+      "groupPolicy": "allowlist",
+      "debounceMs": 0,
+      "mediaMaxMb": 50
+    }
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "lead-crm": {
+          "enabled": true,
+          "env": {
+            "LEAD_DESTINATION": "+549XXXXXXXXXX",
+            "LEAD_FORWARD_MEDIA": "true",
+            "N8N_WEBHOOK_URL": "http://127.0.0.1:5678/webhook/galfredev-leads"
+          }
+        }
+      }
+    }
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "replace-with-secure-token"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "nodes": {
+      "denyCommands": [
+        "camera.snap",
+        "camera.clip",
+        "screen.record",
+        "contacts.add",
+        "calendar.add",
+        "reminders.add",
+        "sms.send"
+      ]
+    }
+  },
+  "skills": {
+    "entries": {}
+  },
+  "plugins": {
+    "slots": {
+      "memory": "none"
+    },
+    "entries": {}
+  }
+}

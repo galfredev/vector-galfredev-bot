@@ -1,0 +1,43 @@
+.openclaw/
+.codex-stage/
+
+# Local env and secrets
+.env
+.env.local
+.env.production
+config.env
+api.env
+env
+
+# OpenClaw runtime state
+credentials/
+logs/
+media/
+memory/
+delivery-queue/
+devices/
+identity/
+canvas/
+completions/
+crm/
+agents/**/sessions/
+agents/**/agent/auth-profiles.json
+agents/**/agent/models.json
+openclaw.json
+exec-approvals.json
+update-check.json
+gateway.cmd
+
+# Generated outputs
+workspace/leads/
+*.log
+*.tmp
+*.bak
+
+# Node / editor
+node_modules/
+dist/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

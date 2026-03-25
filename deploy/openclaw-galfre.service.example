@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenClaw Gateway for GalfreDev
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=openclaw
+WorkingDirectory=/opt/galfre-bot
+Environment=HOME=/opt/galfre-bot
+Environment=PATH=/opt/galfre-bot/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/opt/galfre-bot/.local/bin/openclaw gateway
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
