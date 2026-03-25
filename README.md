@@ -154,6 +154,19 @@ Si queres replicar el flujo en otro proyecto:
 3. excluir credenciales y runtime
 4. documentar deploy y operacion
 
+## Documentacion adicional
+
+- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+- [docs/QUICKSTART.md](./docs/QUICKSTART.md)
+- [docs/DEPLOY.md](./docs/DEPLOY.md)
+- [docs/TESTING.md](./docs/TESTING.md)
+- [docs/PUBLISHING.md](./docs/PUBLISHING.md)
+- [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+## Licencia
+
+MIT. Ver [LICENSE](./LICENSE).
+
 ## Notas
 
 - El contenido del `workspace/` esta en espanol porque el bot fue disenado para atencion comercial en ese idioma.
