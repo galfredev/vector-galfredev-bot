@@ -89,10 +89,10 @@ export function ownerCommandHelp() {
     "Para propuestas de mejora tambien podes responder:",
     "APROBAR",
     "RECHAZAR",
-    "👍",
-    "✅",
-    "❌",
-    "✖️",
+    "\u{1F44D}",
+    "\u2705",
+    "\u274C",
+    "\u2716\uFE0F",
   ].join("\n");
 }
 
@@ -312,7 +312,7 @@ export function buildOwnerBrief(metrics, gatewayStatus) {
     suggestions.push("Hacer una prueba de handoff real para confirmar que el lead te llegue completo.");
   }
   if (metrics.pendingProposal) {
-    suggestions.push(`Si queres aplicar la mejora pendiente, responde APROBAR o 👍.`);
+    suggestions.push(`Si queres aplicar la mejora pendiente, responde APROBAR o \u{1F44D}.`);
   }
   if (metrics.audioMessages > 0 && metrics.audioFriction === 0) {
     suggestions.push("El canal de audio tuvo actividad y no detecte friccion explicita; vale la pena una prueba humana final.");
@@ -339,7 +339,7 @@ export function buildOwnerAudioBrief(metrics, gatewayStatus) {
   }
 
   if (metrics.audioFriction > 0 || metrics.attachmentFriction > 0) {
-    observations.push(`Tambien vi fricciones de audio o adjuntos que conviene seguir corrigiendo.`);
+    observations.push("Tambien vi fricciones de audio o adjuntos que conviene seguir corrigiendo.");
   }
 
   if (!gatewayStatus.whatsappConnected || !gatewayStatus.serviceActive) {
@@ -383,8 +383,8 @@ export function pendingProposalText() {
     `Propuesta pendiente: ${pendingProposal.id}`,
     ...pendingProposal.findings.map((finding, index) => `${index + 1}. ${finding.summary}`),
     "",
-    "Para aplicarla responde: APROBAR o 👍",
-    "Para descartarla responde: RECHAZAR o ❌",
+    `Para aplicarla responde: APROBAR o \u{1F44D}`,
+    `Para descartarla responde: RECHAZAR o \u274C`,
   ].join("\n");
 }
 
