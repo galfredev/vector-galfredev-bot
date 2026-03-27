@@ -2,8 +2,9 @@
 Description=Poll owner commands for Vector
 
 [Timer]
-OnCalendar=*-*-* *:*:00
-Persistent=true
+OnBootSec=15s
+OnUnitActiveSec=15s
+AccuracySec=1s
 Unit=vector-owner-control.service
 
 [Install]
