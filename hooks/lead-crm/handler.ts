@@ -272,6 +272,10 @@ async function handleLeadMessage(event: HookEvent) {
   if (!looksLikeLead) return;
 
   const lead = parseLead(content);
+  if (destinationDigits && lead.whatsappDigits && destinationDigits === lead.whatsappDigits) {
+    return;
+  }
+
   let forwardedMedia: string[] = [];
   let mediaForwardError = "";
 
