@@ -37,6 +37,7 @@ Tambien esta preparado para:
 - entender imagenes y documentos relevantes
 - reenviar adjuntos utiles al handoff interno
 - mejorar de forma supervisada con propuestas por WhatsApp
+- operar un canal interno con Valentino para brief, estado y audio
 - cerrar la conversacion del cliente sin dejarla abrupta
 
 ## Stack
@@ -81,6 +82,7 @@ Mas detalle en [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 - [config/openclaw.example.json](./config/openclaw.example.json)
 - [workflows/n8n/galfredev-leads.workflow.json](./workflows/n8n/galfredev-leads.workflow.json)
 - [docs/OPERATIONS.md](./docs/OPERATIONS.md)
+- [docs/BOT-SUMMARY.md](./docs/BOT-SUMMARY.md)
 
 ## Instalacion rapida
 
@@ -157,6 +159,11 @@ Automatizacion de mejora continua:
 - `scripts/vector-improvement-check-approval.mjs`
 - `scripts/vector-improvement-apply.mjs`
 
+Owner ops:
+
+- `scripts/vector-owner-brief.mjs`
+- `scripts/vector-owner-control-check.mjs`
+
 ## Publicacion en GitHub
 
 Este repo ya fue saneado para compartirse.
@@ -174,6 +181,7 @@ Si queres replicar el flujo en otro proyecto:
 - [docs/QUICKSTART.md](./docs/QUICKSTART.md)
 - [docs/DEPLOY.md](./docs/DEPLOY.md)
 - [docs/ELEVENLABS-CRON-PLAN.md](./docs/ELEVENLABS-CRON-PLAN.md)
+- [docs/BOT-SUMMARY.md](./docs/BOT-SUMMARY.md)
 - [docs/OPERATIONS.md](./docs/OPERATIONS.md)
 - [docs/TESTING.md](./docs/TESTING.md)
 - [docs/PUBLISHING.md](./docs/PUBLISHING.md)

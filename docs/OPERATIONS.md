@@ -47,6 +47,8 @@ Vector Ops agrega una capa de supervision controlada:
 - envia el reporte por WhatsApp al numero autorizado
 - espera aprobacion o rechazo del owner
 - aplica bloques gestionados en el workspace y reinicia el servicio
+- expone un canal interno de comandos para Valentino
+- puede generar briefs internos con audio para el owner
 
 Archivos principales:
 
@@ -62,6 +64,31 @@ Templates de despliegue:
 - `deploy/vector-ops-approval.service.example`
 - `deploy/vector-ops-approval.timer.example`
 
+## Canal interno del owner
+
+Vector tambien puede operar como asistente interno de Valentino por WhatsApp:
+
+- `BRIEF`: manda un resumen manual
+- `ESTADO`: manda estado operativo del bot
+- `PROPUESTAS`: resume propuestas pendientes
+- `AUDIO ON`: activa audio en briefs
+- `AUDIO OFF`: desactiva audio en briefs
+- `TEST AUDIO`: envia una prueba de voz
+- `AYUDA`: lista comandos
+
+Archivos principales:
+
+- `scripts/vector-owner-lib.mjs`
+- `scripts/vector-owner-brief.mjs`
+- `scripts/vector-owner-control-check.mjs`
+
+Templates de despliegue:
+
+- `deploy/vector-owner-brief.service.example`
+- `deploy/vector-owner-brief.timer.example`
+- `deploy/vector-owner-control.service.example`
+- `deploy/vector-owner-control.timer.example`
+
 ## Servicios productivos esperados
 
 En el VPS se espera algo como:
@@ -69,6 +96,8 @@ En el VPS se espera algo como:
 - `openclaw-galfre.service`: gateway principal del bot
 - `vector-ops-analyze.timer`: analisis periodico de mejora
 - `vector-ops-approval.timer`: polling de aprobaciones por WhatsApp
+- `vector-owner-brief.timer`: brief periodico al owner
+- `vector-owner-control.timer`: polling de comandos del owner
 
 ## Verificaciones manuales recomendadas
 
@@ -78,6 +107,8 @@ Antes de considerar un deploy como cerrado, conviene probar:
 2. una imagen o PDF real
 3. un lead que termine en derivacion a Valentino
 4. una aprobacion de propuesta por WhatsApp
+5. un `BRIEF` manual desde el chat de Valentino
+6. un `TEST AUDIO` desde el chat de Valentino
 
 ## Limites conocidos
 

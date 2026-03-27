@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Vector owner brief check daily
+
+[Timer]
+OnCalendar=*-*-* 13:30:00
+Persistent=true
+Unit=vector-owner-brief.service
+
+[Install]
+WantedBy=timers.target

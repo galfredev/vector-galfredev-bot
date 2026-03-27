@@ -10,6 +10,11 @@ Verificar 3 cosas:
 2. que el flujo comercial cierre correctamente
 3. que el registro interno del lead siga funcionando
 
+Y ahora tambien:
+
+4. que el canal interno con Valentino funcione
+5. que el brief y el audio interno lleguen bien
+
 ## Casos minimos recomendados
 
 ### 1. Saludo inicial
@@ -138,3 +143,63 @@ Revisar:
 - cierre vacio al cliente
 - webhook de `n8n` caido
 - numeros o links mal formados en el lead
+
+## Pruebas rapidas del owner
+
+Desde el chat de Valentino con el bot:
+
+### 1. Brief manual
+
+Mensaje:
+
+```text
+BRIEF
+```
+
+Esperado:
+
+- llega un brief por WhatsApp
+- incluye contactos, leads, estado y propuesta pendiente si existe
+
+### 2. Estado del bot
+
+Mensaje:
+
+```text
+ESTADO
+```
+
+Esperado:
+
+- informa si el servicio esta activo
+- informa si WhatsApp esta conectado
+- informa si audio para briefs esta activo
+
+### 3. Test de audio
+
+Mensaje:
+
+```text
+TEST AUDIO
+```
+
+Esperado:
+
+- llega un audio o adjunto de voz al chat de Valentino
+
+### 4. Toggle de audio
+
+Mensajes:
+
+```text
+AUDIO OFF
+```
+
+```text
+AUDIO ON
+```
+
+Esperado:
+
+- confirma cada cambio
+- el siguiente brief respeta la preferencia
