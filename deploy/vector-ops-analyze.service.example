@@ -1,0 +1,19 @@
+[Unit]
+Description=Vector Ops periodic improvement analysis
+After=network-online.target openclaw-galfre.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/galfre-bot/openclaw
+Environment=VECTOR_HOME=/opt/galfre-bot
+Environment=VECTOR_STATE_DIR=/opt/galfre-bot/.openclaw
+Environment=VECTOR_WORKSPACE_DIR=/opt/galfre-bot/.openclaw/workspace
+Environment=VECTOR_REPO_DIR=/opt/galfre-bot/openclaw
+Environment=VECTOR_OPENCLAW_USER=openclaw
+Environment=VECTOR_OPENCLAW_BIN=/opt/galfre-bot/.local/bin/openclaw
+Environment=VECTOR_APPROVER_NUMBER=+5493571606142
+Environment=VECTOR_APPROVER_NAME=Valentino
+ExecStart=/usr/bin/node /opt/galfre-bot/openclaw/scripts/vector-improvement-analyze.mjs
+

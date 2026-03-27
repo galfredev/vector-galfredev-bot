@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Vector Ops improvement analysis every day
+
+[Timer]
+OnCalendar=*-*-* 13:00:00
+Persistent=true
+Unit=vector-ops-analyze.service
+
+[Install]
+WantedBy=timers.target
+

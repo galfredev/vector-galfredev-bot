@@ -33,8 +33,10 @@ Su objetivo es:
 
 Tambien esta preparado para:
 
+- transcribir audios con `whisper.cpp` via CLI local
 - entender imagenes y documentos relevantes
 - reenviar adjuntos utiles al handoff interno
+- mejorar de forma supervisada con propuestas por WhatsApp
 - cerrar la conversacion del cliente sin dejarla abrupta
 
 ## Stack
@@ -78,6 +80,7 @@ Mas detalle en [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 - [hooks/lead-crm/handler.ts](./hooks/lead-crm/handler.ts)
 - [config/openclaw.example.json](./config/openclaw.example.json)
 - [workflows/n8n/galfredev-leads.workflow.json](./workflows/n8n/galfredev-leads.workflow.json)
+- [docs/OPERATIONS.md](./docs/OPERATIONS.md)
 
 ## Instalacion rapida
 
@@ -143,6 +146,17 @@ Export de leads desde sesiones locales:
 powershell -ExecutionPolicy Bypass -File .\scripts\export-leads.ps1
 ```
 
+Wrappers de transcripcion local:
+
+- `scripts/openclaw-whisper-stt.ps1`
+- `scripts/openclaw-whisper-stt.sh`
+
+Automatizacion de mejora continua:
+
+- `scripts/vector-improvement-analyze.mjs`
+- `scripts/vector-improvement-check-approval.mjs`
+- `scripts/vector-improvement-apply.mjs`
+
 ## Publicacion en GitHub
 
 Este repo ya fue saneado para compartirse.
@@ -159,6 +173,7 @@ Si queres replicar el flujo en otro proyecto:
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 - [docs/QUICKSTART.md](./docs/QUICKSTART.md)
 - [docs/DEPLOY.md](./docs/DEPLOY.md)
+- [docs/OPERATIONS.md](./docs/OPERATIONS.md)
 - [docs/TESTING.md](./docs/TESTING.md)
 - [docs/PUBLISHING.md](./docs/PUBLISHING.md)
 - [CONTRIBUTING.md](./CONTRIBUTING.md)

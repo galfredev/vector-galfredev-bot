@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { appendFile, copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
@@ -8,7 +8,7 @@ const execFileAsync = promisify(execFile);
 type HookEvent = {
   type: string;
   action: string;
-  timestamp: Date;
+  timestamp: Date | string | number;
   context: Record<string, unknown>;
 };
 
@@ -52,24 +52,42 @@ function sourceKeyFromContext(context: Record<string, unknown>) {
   const from = String(context.from || context.senderId || "");
   const conversationId = String(context.conversationId || "");
   const digits = normalizeDigits(from);
-  return conversationId || digits || from || "unknown";
+  return digits || conversationId || from || "unknown";
 }
 
 function isRelevantMediaType(mediaType: string | undefined) {
   if (!mediaType) return false;
   return (
     mediaType.startsWith("image/") ||
+    mediaType.startsWith("audio/") ||
+    mediaType.startsWith("video/") ||
     mediaType.startsWith("application/pdf") ||
+    mediaType.startsWith("application/rtf") ||
     mediaType.startsWith("application/msword") ||
+    mediaType.startsWith("application/vnd.") ||
     mediaType.startsWith("application/vnd.openxmlformats-officedocument") ||
     mediaType.startsWith("text/")
   );
 }
 
+function eventTimestamp(value: HookEvent["timestamp"]) {
+  const parsed = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return new Date();
+  }
+  return parsed;
+}
+
 function parseLead(content: string) {
-  const readField = (label: string) => {
-    const match = content.match(new RegExp(`${label}:\\s*(.+)`, "i"));
-    return match?.[1]?.trim() || "";
+  const readField = (...labels: string[]) => {
+    for (const label of labels) {
+      const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const match = content.match(new RegExp(`${escaped}:\\s*(.+)`, "i"));
+      if (match?.[1]?.trim()) {
+        return match[1].trim();
+      }
+    }
+    return "";
   };
 
   const whatsapp = readField("WhatsApp");
@@ -81,9 +99,10 @@ function parseLead(content: string) {
     whatsapp,
     whatsappDigits: normalizeDigits(whatsapp || openChat),
     openChat,
-    business: readField("Negocio"),
+    business: readField("Negocio", "Rubro"),
     need: readField("Necesidad"),
-    currentProcess: readField("Como lo hacen hoy"),
+    currentProcess: readField("Como lo hacen hoy", "Cómo lo hacen hoy"),
+    desiredProcess: readField("Como lo quieren hacer", "Cómo lo quieren hacer", "Objetivo"),
     status: readField("Estado"),
     raw: content,
   };
@@ -94,12 +113,8 @@ async function ensureDir(dir: string) {
 }
 
 async function appendJsonl(filePath: string, payload: unknown) {
-  let existing = "";
-  try {
-    existing = await readFile(filePath, "utf8");
-  } catch {}
   const line = `${JSON.stringify(payload)}\n`;
-  await writeFile(filePath, existing + line, "utf8");
+  await appendFile(filePath, line, "utf8");
 }
 
 async function loadCache(filePath: string): Promise<CachedMedia[]> {
@@ -122,6 +137,7 @@ async function cacheInboundMedia(event: HookEvent) {
   const mediaType = String(context.mediaType || "");
   const from = String(context.from || context.senderId || "");
   const digits = normalizeDigits(from);
+  const occurredAt = eventTimestamp(event.timestamp);
 
   if (!mediaPath || !isRelevantMediaType(mediaType) || SELF_NUMBERS.has(digits)) {
     return;
@@ -147,11 +163,27 @@ async function cacheInboundMedia(event: HookEvent) {
     storedPath: targetPath,
     originalPath: mediaPath,
     description: String(context.bodyForAgent || context.body || "").slice(0, 1200),
-    timestamp: event.timestamp.toISOString(),
+    timestamp: occurredAt.toISOString(),
     forwarded: false,
   });
 
-  await saveCache(cacheFile, items.slice(-3));
+  await saveCache(cacheFile, items.slice(-5));
+}
+
+function resolveOpenClawCommand() {
+  const configured = (process.env.OPENCLAW_BIN || "").trim();
+  if (configured) {
+    return { file: configured, argsPrefix: [] as string[] };
+  }
+
+  if (process.platform === "win32") {
+    return { file: "cmd.exe", argsPrefix: ["/c", "openclaw"] };
+  }
+
+  return {
+    file: path.join(homeDir(), ".local", "bin", "openclaw"),
+    argsPrefix: [] as string[],
+  };
 }
 
 async function forwardMediaIfAny(lead: ReturnType<typeof parseLead>) {
@@ -167,7 +199,7 @@ async function forwardMediaIfAny(lead: ReturnType<typeof parseLead>) {
   const pending = items.filter((item) => !item.forwarded);
   if (pending.length === 0) return [];
 
-  const openclawBin = path.join(homeDir(), ".local", "bin", "openclaw");
+  const command = resolveOpenClawCommand();
   const destination = process.env.LEAD_DESTINATION || "+5493571606142";
   const forwarded: string[] = [];
 
@@ -180,12 +212,13 @@ async function forwardMediaIfAny(lead: ReturnType<typeof parseLead>) {
       .filter(Boolean)
       .join("\n");
 
-    await execFileAsync(openclawBin, [
+    await execFileAsync(command.file, [
+      ...command.argsPrefix,
       "message",
       "send",
       "--channel",
       "whatsapp",
-      "--to",
+      "--target",
       destination,
       "--media",
       item.storedPath,
@@ -225,15 +258,31 @@ async function handleLeadMessage(event: HookEvent) {
   const content = String(context.content || "");
   const channelId = String(context.channelId || "");
   const success = Boolean(context.success);
+  const occurredAt = eventTimestamp(event.timestamp);
+  const destinationDigits = normalizeDigits(process.env.LEAD_DESTINATION || "+5493571606142");
+  const toDigits = normalizeDigits(String(context.to || ""));
+  const looksLikeLead =
+    /nuevo lead/i.test(content) &&
+    /nombre:/i.test(content) &&
+    /necesidad:/i.test(content) &&
+    /estado:/i.test(content);
 
   if (channelId !== "whatsapp" || !success) return;
-  if (!content.startsWith("Nuevo lead desde el bot de GalfreDev")) return;
+  if (destinationDigits && toDigits && destinationDigits !== toDigits) return;
+  if (!looksLikeLead) return;
 
   const lead = parseLead(content);
-  const forwardedMedia = await forwardMediaIfAny(lead);
+  let forwardedMedia: string[] = [];
+  let mediaForwardError = "";
+
+  try {
+    forwardedMedia = await forwardMediaIfAny(lead);
+  } catch (error) {
+    mediaForwardError = error instanceof Error ? error.message : String(error);
+  }
 
   const payload = {
-    createdAt: event.timestamp.toISOString(),
+    createdAt: occurredAt.toISOString(),
     lead,
     delivery: {
       to: String(context.to || ""),
@@ -241,6 +290,7 @@ async function handleLeadMessage(event: HookEvent) {
       messageId: String(context.messageId || ""),
     },
     media: forwardedMedia,
+    mediaForwardError: mediaForwardError || undefined,
   };
 
   await ensureDir(crmDir());

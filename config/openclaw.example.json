@@ -59,7 +59,22 @@
       },
       "audio": {
         "enabled": true,
-        "maxBytes": 20971520
+        "maxBytes": 20971520,
+        "models": [
+          {
+            "type": "cli",
+            "command": "powershell",
+            "args": [
+              "-NoProfile",
+              "-ExecutionPolicy",
+              "Bypass",
+              "-File",
+              "C:\\Users\\YOUR_USER\\.local\\bin\\openclaw-whisper-stt.ps1",
+              "{{MediaPath}}"
+            ],
+            "timeoutSeconds": 120
+          }
+        ]
       }
     },
     "web": {
@@ -131,7 +146,11 @@
     }
   },
   "skills": {
-    "entries": {}
+    "entries": {
+      "openai-whisper-api": {
+        "apiKey": "replace-with-openai-api-key"
+      }
+    }
   },
   "plugins": {
     "slots": {
