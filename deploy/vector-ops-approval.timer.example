@@ -2,8 +2,9 @@
 Description=Poll WhatsApp approvals for Vector Ops
 
 [Timer]
-OnCalendar=*:0/5
-Persistent=true
+OnBootSec=20s
+OnUnitActiveSec=20s
+AccuracySec=1s
 Unit=vector-ops-approval.service
 
 [Install]
