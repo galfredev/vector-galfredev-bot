@@ -173,6 +173,7 @@ Si queres replicar el flujo en otro proyecto:
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 - [docs/QUICKSTART.md](./docs/QUICKSTART.md)
 - [docs/DEPLOY.md](./docs/DEPLOY.md)
+- [docs/ELEVENLABS-CRON-PLAN.md](./docs/ELEVENLABS-CRON-PLAN.md)
 - [docs/OPERATIONS.md](./docs/OPERATIONS.md)
 - [docs/TESTING.md](./docs/TESTING.md)
 - [docs/PUBLISHING.md](./docs/PUBLISHING.md)
