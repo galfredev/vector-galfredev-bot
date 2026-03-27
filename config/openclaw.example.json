@@ -7,6 +7,9 @@
       "model": {
         "primary": "openai-codex/gpt-5.4"
       },
+      "imageModel": {
+        "primary": "openai-codex/gpt-5.4"
+      },
       "models": {
         "openai-codex/gpt-5.4": {},
         "openai-codex/gpt-5.4-mini": {},
