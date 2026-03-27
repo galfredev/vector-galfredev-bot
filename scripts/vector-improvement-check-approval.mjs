@@ -70,6 +70,7 @@ const approves =
   normalizedBody === `REALIZAR ${proposalId}`;
 const rejects =
   normalizedBody === "RECHAZAR" ||
+  normalizedBody === "NO APROBAR" ||
   normalizedBody === "CANCELAR" ||
   normalizedBody === "NO APLICAR" ||
   normalizedBody === "NO APLICAR PROPUESTA" ||

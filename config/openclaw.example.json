@@ -109,6 +109,20 @@
       "mediaMaxMb": 50
     }
   },
+  "messages": {
+    "tts": {
+      "auto": "off",
+      "provider": "microsoft",
+      "microsoft": {
+        "enabled": true,
+        "voice": "es-AR-TomasNeural",
+        "lang": "es-AR",
+        "outputFormat": "audio-24khz-48kbitrate-mono-mp3",
+        "rate": "-5%",
+        "pitch": "-8%"
+      }
+    }
+  },
   "hooks": {
     "internal": {
       "enabled": true,

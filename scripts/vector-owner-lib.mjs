@@ -88,6 +88,7 @@ export function ownerCommandHelp() {
     "",
     "Para propuestas de mejora tambien podes responder:",
     "APROBAR",
+    "NO APROBAR",
     "RECHAZAR",
     "\u{1F44D}",
     "\u2705",
@@ -101,6 +102,7 @@ export function isApprovalCommand(body) {
   return (
     normalized === "SI" ||
     normalized === "APROBAR" ||
+    normalized === "NO APROBAR" ||
     normalized === "RECHAZAR" ||
     normalized === "APLICAR" ||
     normalized === "CANCELAR" ||
@@ -384,7 +386,7 @@ export function pendingProposalText() {
     ...pendingProposal.findings.map((finding, index) => `${index + 1}. ${finding.summary}`),
     "",
     `Para aplicarla responde: APROBAR o \u{1F44D}`,
-    `Para descartarla responde: RECHAZAR o \u274C`,
+    `Para descartarla responde: NO APROBAR, RECHAZAR o \u274C`,
   ].join("\n");
 }
 
