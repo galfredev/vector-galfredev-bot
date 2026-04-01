@@ -1,0 +1,148 @@
+{
+  "name": "GalfreDev CRM Hub Intake",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "galfredev-crm-hub",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "WebhookCrmHubIn",
+      "name": "CRM Hub Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 320],
+      "webhookId": "galfredev-crm-hub"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "raw_payload", "name": "raw_payload", "value": "={{ $json }}", "type": "object" },
+            { "id": "normalized", "name": "normalized", "value": "={{ $json.normalized || {} }}", "type": "object" },
+            { "id": "received_at", "name": "received_at", "value": "={{ $now }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "SetPayload",
+      "name": "Set Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [520, 320]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "lead_title", "name": "lead_title", "value": "={{ $json.normalized?.opportunity?.title || $json.raw_payload?.lead?.title || 'Nuevo lead' }}", "type": "string" },
+            { "id": "person_name", "name": "person_name", "value": "={{ $json.normalized?.person?.name || '' }}", "type": "string" },
+            { "id": "company_name", "name": "company_name", "value": "={{ $json.normalized?.company?.displayName || '' }}", "type": "string" },
+            { "id": "opportunity_stage", "name": "opportunity_stage", "value": "={{ $json.normalized?.opportunity?.stage || 'new' }}", "type": "string" },
+            { "id": "opportunity_status", "name": "opportunity_status", "value": "={{ $json.normalized?.opportunity?.status || 'Nuevo' }}", "type": "string" },
+            { "id": "lead_summary", "name": "lead_summary", "value": "={{ $json.normalized?.opportunity?.summary || '' }}", "type": "string" },
+            { "id": "whatsapp_digits", "name": "whatsapp_digits", "value": "={{ $json.normalized?.person?.whatsappDigits || '' }}", "type": "string" },
+            { "id": "open_chat", "name": "open_chat", "value": "={{ $json.normalized?.person?.openChat || '' }}", "type": "string" },
+            { "id": "current_process", "name": "current_process", "value": "={{ $json.normalized?.opportunity?.currentProcess || '' }}", "type": "string" },
+            { "id": "desired_process", "name": "desired_process", "value": "={{ $json.normalized?.opportunity?.desiredProcess || '' }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "SetHubFields",
+      "name": "Set Hub Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [780, 320]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "target_twenty", "name": "target_twenty", "value": "={{ true }}", "type": "boolean" },
+            { "id": "target_notion", "name": "target_notion", "value": "={{ true }}", "type": "boolean" },
+            { "id": "target_sheets", "name": "target_sheets", "value": "={{ true }}", "type": "boolean" },
+            { "id": "target_gmail", "name": "target_gmail", "value": "={{ false }}", "type": "boolean" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "SetTargets",
+      "name": "Set Targets",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1040, 320]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, crm: 'galfredev-crm-hub', receivedAt: $json.received_at, leadTitle: $json.lead_title, stage: $json.opportunity_stage, targets: { twenty: $json.target_twenty, notion: $json.target_notion, sheets: $json.target_sheets, gmail: $json.target_gmail } } }}",
+        "options": {}
+      },
+      "id": "RespondHubOk",
+      "name": "Respond Hub OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1300, 320]
+    }
+  ],
+  "connections": {
+    "CRM Hub Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Payload": {
+      "main": [
+        [
+          {
+            "node": "Set Hub Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Hub Fields": {
+      "main": [
+        [
+          {
+            "node": "Set Targets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Targets": {
+      "main": [
+        [
+          {
+            "node": "Respond Hub OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  },
+  "pinData": {},
+  "meta": null,
+  "active": true,
+  "versionId": "galfredev-crm-hub-v1",
+  "tags": []
+}

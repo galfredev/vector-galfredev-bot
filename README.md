@@ -6,7 +6,7 @@ Este repositorio contiene la parte versionable del proyecto:
 
 - identidad y prompts del agente
 - hook interno para CRM y reenvio de adjuntos relevantes
-- workflow de `n8n` para intake de leads
+- workflows canonicos de `n8n` para intake de leads y CRM Hub
 - ejemplos de configuracion y despliegue
 - scripts de soporte
 
@@ -46,6 +46,7 @@ Tambien esta preparado para:
 - WhatsApp
 - OpenAI `gpt-5.4`
 - `n8n`
+- `Twenty`
 - TypeScript
 - PowerShell
 - Linux `systemd` para produccion
@@ -58,6 +59,7 @@ flowchart LR
   B --> C["Prompts en workspace/"]
   B --> D["Hook lead-crm"]
   D --> E["Webhook de n8n"]
+  E --> H["Twenty CRM Hub"]
   D --> F["Handoff interno a Valentino"]
   D --> G["Cache / reenvio de adjuntos"]
 ```
@@ -69,7 +71,7 @@ Mas detalle en [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 - [workspace/](./workspace/): identidad, prompts, memoria y reglas del agente
 - [hooks/lead-crm/](./hooks/lead-crm/): hook que registra leads y reenvia adjuntos
 - [scripts/](./scripts/): utilidades de soporte, como export de leads
-- [workflows/n8n/](./workflows/n8n/): workflow de intake para `n8n`
+- [workflows/n8n/](./workflows/n8n/): workflows de intake y CRM Hub para `n8n`
 - [config/](./config/): configuracion de ejemplo de OpenClaw
 - [deploy/](./deploy/): templates de despliegue
 - [docs/](./docs/): documentacion operativa y de publicacion
@@ -80,9 +82,16 @@ Mas detalle en [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 - [workspace/MEMORY.md](./workspace/MEMORY.md)
 - [hooks/lead-crm/handler.ts](./hooks/lead-crm/handler.ts)
 - [config/openclaw.example.json](./config/openclaw.example.json)
-- [workflows/n8n/galfredev-leads.workflow.json](./workflows/n8n/galfredev-leads.workflow.json)
+- [workflows/n8n/galfredev-twenty-forward.workflow.json](./workflows/n8n/galfredev-twenty-forward.workflow.json)
+- [workflows/n8n/galfredev-master-hub.workflow.json](./workflows/n8n/galfredev-master-hub.workflow.json)
+- [workflows/n8n/galfredev-crm-hub.workflow.json](./workflows/n8n/galfredev-crm-hub.workflow.json)
 - [docs/OPERATIONS.md](./docs/OPERATIONS.md)
 - [docs/BOT-SUMMARY.md](./docs/BOT-SUMMARY.md)
+- [docs/TWENTY-CRM-HUB.md](./docs/TWENTY-CRM-HUB.md)
+- [docs/MASTER-FLOW.md](./docs/MASTER-FLOW.md)
+- [docs/GMAIL-PLAYBOOK.md](./docs/GMAIL-PLAYBOOK.md)
+- [docs/TWENTY-WORKFLOW-SETUP.md](./docs/TWENTY-WORKFLOW-SETUP.md)
+- [docs/LIVE-SETUP-CHECKLIST.md](./docs/LIVE-SETUP-CHECKLIST.md)
 
 ## Instalacion rapida
 
@@ -92,8 +101,8 @@ Resumen corto:
 2. Copiar `workspace/` a `~/.openclaw/workspace/`.
 3. Copiar `hooks/lead-crm/` a `~/.openclaw/hooks/lead-crm/`.
 4. Crear `~/.openclaw/openclaw.json` a partir de `config/openclaw.example.json`.
-5. Configurar destino de leads, webhook de `n8n` y token del gateway.
-6. Importar el workflow de `n8n`.
+5. Configurar destino de leads, webhook de `n8n`, CRM Hub y token del gateway.
+6. Importar el workflow canonico de `n8n`.
 7. Relinkear WhatsApp.
 8. Levantar OpenClaw como servicio.
 
@@ -101,6 +110,14 @@ Guia paso a paso:
 
 - [docs/QUICKSTART.md](./docs/QUICKSTART.md)
 - [docs/DEPLOY.md](./docs/DEPLOY.md)
+
+## Convenciones de workflows
+
+Los workflows versionados y soportados del proyecto viven en:
+
+- `workflows/n8n/*.workflow.json`
+
+Los exports de debugging, snapshots del setup vivo o archivos de import puntual no forman parte del set canonico y no deben commitearse.
 
 ## Flujo comercial
 
@@ -164,6 +181,14 @@ Owner ops:
 - `scripts/vector-owner-brief.mjs`
 - `scripts/vector-owner-control-check.mjs`
 
+Validaciones locales del repo:
+
+```bash
+npm install
+npm run check
+npm run validate:crm-payload -- ./docs/examples/sample-lead-payload.json
+```
+
 ## Publicacion en GitHub
 
 Este repo ya fue saneado para compartirse.
@@ -182,6 +207,11 @@ Si queres replicar el flujo en otro proyecto:
 - [docs/DEPLOY.md](./docs/DEPLOY.md)
 - [docs/ELEVENLABS-CRON-PLAN.md](./docs/ELEVENLABS-CRON-PLAN.md)
 - [docs/BOT-SUMMARY.md](./docs/BOT-SUMMARY.md)
+- [docs/TWENTY-CRM-HUB.md](./docs/TWENTY-CRM-HUB.md)
+- [docs/MASTER-FLOW.md](./docs/MASTER-FLOW.md)
+- [docs/GMAIL-PLAYBOOK.md](./docs/GMAIL-PLAYBOOK.md)
+- [docs/TWENTY-WORKFLOW-SETUP.md](./docs/TWENTY-WORKFLOW-SETUP.md)
+- [docs/LIVE-SETUP-CHECKLIST.md](./docs/LIVE-SETUP-CHECKLIST.md)
 - [docs/OPERATIONS.md](./docs/OPERATIONS.md)
 - [docs/TESTING.md](./docs/TESTING.md)
 - [docs/PUBLISHING.md](./docs/PUBLISHING.md)

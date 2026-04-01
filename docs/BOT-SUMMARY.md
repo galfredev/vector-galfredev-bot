@@ -17,8 +17,11 @@
 - deriva a Valentino con link directo
 - genera una nota interna de lead
 - registra el lead y lo manda a `n8n`
+- emite un payload normalizado para CRM Hub
 - usa audios, imagenes, capturas, PDFs y documentos como contexto
 - reenvia adjuntos relevantes al handoff interno
+- puede alimentar `Twenty`, `Google Sheets` y `Notion`
+- puede disparar `Gmail` interno y `Gmail` saliente al lead cuando el caso lo justifica
 
 ## Capa de owner ops
 
@@ -40,6 +43,7 @@
 - OpenAI `gpt-5.4`
 - WhatsApp channel de OpenClaw
 - `n8n` para intake de leads
+- `Twenty` como CRM central
 - `whisper.cpp` para STT local
 - TTS nativo de OpenClaw para owner audio
 - TypeScript para hooks
@@ -77,6 +81,7 @@ Lo que ya esta listo:
 - handoff enriquecido
 - mejora continua supervisada
 - canal interno con owner
+- payload normalizado para CRM Hub
 
 Lo que todavia requiere prueba humana final:
 

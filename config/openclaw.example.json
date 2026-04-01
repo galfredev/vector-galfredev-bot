@@ -132,7 +132,8 @@
           "env": {
             "LEAD_DESTINATION": "+549XXXXXXXXXX",
             "LEAD_FORWARD_MEDIA": "true",
-            "N8N_WEBHOOK_URL": "http://127.0.0.1:5678/webhook/galfredev-leads"
+            "N8N_WEBHOOK_URL": "http://127.0.0.1:5678/webhook/galfredev-twenty-forward",
+            "CRM_FANOUT_WEBHOOK_URLS": ""
           }
         }
       }

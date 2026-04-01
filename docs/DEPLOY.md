@@ -9,6 +9,7 @@ Guia pensada para un VPS Linux con OpenClaw y `n8n`.
 - OpenClaw instalado por usuario dedicado
 - `n8n` en el mismo VPS o accesible por red
 - `systemd` para mantener el gateway arriba
+- `Twenty` opcional pero recomendado como CRM hub
 
 ## Layout sugerido
 
@@ -48,14 +49,24 @@ Completar especialmente:
 - `gateway.auth.token`
 - `hooks.internal.entries.lead-crm.env.LEAD_DESTINATION`
 - `hooks.internal.entries.lead-crm.env.N8N_WEBHOOK_URL`
+- `hooks.internal.entries.lead-crm.env.CRM_FANOUT_WEBHOOK_URLS`
 
 ### 4. Importar el workflow de n8n
 
-Importar:
+Importar como workflow canonico:
 
-- [`../workflows/n8n/galfredev-leads.workflow.json`](../workflows/n8n/galfredev-leads.workflow.json)
+- [`../workflows/n8n/galfredev-master-hub.workflow.json`](../workflows/n8n/galfredev-master-hub.workflow.json)
 
 Y dejarlo activo o publicado.
+
+El master hub ya contempla:
+
+- alta de `Company`, `Person` y `Opportunity` en `Twenty` via GraphQL
+- append operativo en `Google Sheets`
+- alta complementaria en `Notion`
+- alerta interna via `Gmail`
+
+Los workflows `galfredev-crm-hub` y `galfredev-twenty-forward` quedan disponibles solo como referencia o migracion incremental.
 
 ### 5. Enlazar WhatsApp
 
@@ -98,6 +109,7 @@ Despues del deploy:
 4. probar un lead real
 5. probar audio o imagen
 6. confirmar que el webhook de `n8n` recibe el lead
+7. confirmar que `n8n` puede reenviar a `Twenty` si corresponde
 
 ## Notas de seguridad
 

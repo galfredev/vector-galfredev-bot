@@ -25,6 +25,20 @@ type CachedMedia = {
   forwarded?: boolean;
 };
 
+type WebhookDispatchResult = {
+  target: string;
+  ok: boolean;
+  error?: string;
+};
+
+type ForwardedMedia = {
+  storedPath: string;
+  mediaType: string;
+  description: string;
+  timestamp: string;
+  isImage: boolean;
+};
+
 const SELF_NUMBERS = new Set(["5493571606142", "5493571606142@s.whatsapp.net"]);
 
 function homeDir() {
@@ -46,6 +60,10 @@ function mediaCacheDir() {
 function normalizeDigits(value: string | undefined) {
   if (!value) return "";
   return value.replace(/\D+/g, "");
+}
+
+function normalizeText(value: string | undefined) {
+  return (value || "").replace(/\s+/g, " ").trim();
 }
 
 function sourceKeyFromContext(context: Record<string, unknown>) {
@@ -105,6 +123,108 @@ function parseLead(content: string) {
     desiredProcess: readField("Como lo quieren hacer", "Cómo lo quieren hacer", "Objetivo"),
     status: readField("Estado"),
     raw: content,
+  };
+}
+
+function opportunityTitleFromLead(lead: ReturnType<typeof parseLead>) {
+  const business = normalizeText(lead.business);
+  const need = normalizeText(lead.need);
+  const name = normalizeText(lead.name);
+
+  if (need && business) return `${need} - ${business}`;
+  if (need && name) return `${need} - ${name}`;
+  if (need) return need;
+  if (business) return `Oportunidad - ${business}`;
+  if (name) return `Oportunidad - ${name}`;
+  return lead.title;
+}
+
+function mapLeadStatusToStage(status: string) {
+  const normalized = normalizeText(status).toLowerCase();
+
+  if (!normalized) return "new";
+  if (/(cerrad|ganad|convertid|cliente)/i.test(normalized)) return "won";
+  if (/(perdid|descart|no aplica|sin fit)/i.test(normalized)) return "lost";
+  if (/(handoff|derivad|agend|seguim|seguimiento)/i.test(normalized)) return "qualified";
+  if (/(calific|interesad|evaluando)/i.test(normalized)) return "qualified";
+  return "new";
+}
+
+function buildNormalizedPayload(
+  lead: ReturnType<typeof parseLead>,
+  event: HookEvent,
+  forwardedMedia: ForwardedMedia[],
+) {
+  const context = event.context;
+  const occurredAt = eventTimestamp(event.timestamp).toISOString();
+  const sourceKey = sourceKeyFromContext(context);
+  const personName = normalizeText(lead.name);
+  const companyName = normalizeText(lead.business);
+  const need = normalizeText(lead.need);
+  const currentProcess = normalizeText(lead.currentProcess);
+  const desiredProcess = normalizeText(lead.desiredProcess);
+  const status = normalizeText(lead.status);
+  const senderName = normalizeText(String(context.senderName || ""));
+  const attachmentCount = forwardedMedia.length;
+  const hasImageAttachments = forwardedMedia.some((item) => item.isImage);
+  const hasDocumentAttachments = forwardedMedia.some(
+    (item) => !item.isImage && item.mediaType !== "audio/unknown",
+  );
+
+  return {
+    schemaVersion: "crm-hub.v1",
+    source: {
+      bot: "Vector",
+      brand: "GalfreDev",
+      channel: String(context.channelId || "whatsapp"),
+      sourceKey,
+      conversationId: String(context.conversationId || ""),
+      messageId: String(context.messageId || ""),
+      occurredAt,
+    },
+    person: {
+      name: personName || senderName || "Lead sin nombre",
+      whatsapp: lead.whatsapp || "",
+      whatsappDigits: lead.whatsappDigits || "",
+      openChat: lead.openChat || "",
+      senderName,
+    },
+    company: {
+      name: companyName,
+      displayName: companyName || personName || senderName || "Lead sin empresa",
+    },
+    opportunity: {
+      title: opportunityTitleFromLead(lead),
+      stage: mapLeadStatusToStage(status),
+      status: status || "Nuevo",
+      summary: need,
+      currentProcess,
+      desiredProcess,
+      source: "whatsapp",
+      owner: "Valentino",
+    },
+    note: {
+      title: lead.title,
+      body: lead.raw,
+    },
+    attachments: forwardedMedia.map((item) => ({
+      storedPath: item.storedPath,
+      kind: "forwarded-media",
+      mediaType: item.mediaType,
+      description: item.description,
+      timestamp: item.timestamp,
+      isImage: item.isImage,
+    })),
+    syncHints: {
+      suggestedSystems: ["twenty", "notion", "google-sheets"],
+      gmailThreadRecommended: Boolean(need || companyName || personName),
+      createTaskRecommended: Boolean(need),
+      attachmentCount,
+      hasAttachments: attachmentCount > 0,
+      hasImageAttachments,
+      hasDocumentAttachments,
+      imageUnderstandingRecommended: hasImageAttachments,
+    },
   };
 }
 
@@ -201,7 +321,7 @@ async function forwardMediaIfAny(lead: ReturnType<typeof parseLead>) {
 
   const command = resolveOpenClawCommand();
   const destination = process.env.LEAD_DESTINATION || "+5493571606142";
-  const forwarded: string[] = [];
+  const forwarded: ForwardedMedia[] = [];
 
   for (const item of pending.slice(0, 3)) {
     const caption = [
@@ -227,7 +347,13 @@ async function forwardMediaIfAny(lead: ReturnType<typeof parseLead>) {
     ]);
 
     item.forwarded = true;
-    forwarded.push(item.storedPath);
+    forwarded.push({
+      storedPath: item.storedPath,
+      mediaType: item.mediaType || "application/octet-stream",
+      description: item.description || "",
+      timestamp: item.timestamp,
+      isImage: (item.mediaType || "").startsWith("image/"),
+    });
   }
 
   await saveCache(cacheFile, items);
@@ -235,22 +361,43 @@ async function forwardMediaIfAny(lead: ReturnType<typeof parseLead>) {
 }
 
 async function postToN8n(payload: unknown) {
-  const url = (process.env.N8N_WEBHOOK_URL || "").trim();
-  if (!url) return;
+  const targets = [
+    (process.env.N8N_WEBHOOK_URL || "").trim(),
+    ...(process.env.CRM_FANOUT_WEBHOOK_URLS || "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean),
+  ].filter(Boolean);
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000);
+  const dedupedTargets = [...new Set(targets)];
+  const results: WebhookDispatchResult[] = [];
 
-  try {
-    await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    });
-  } finally {
-    clearTimeout(timeout);
+  if (dedupedTargets.length === 0) return results;
+
+  for (const target of dedupedTargets) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    try {
+      await fetch(target, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+      results.push({ target, ok: true });
+    } catch (error) {
+      results.push({
+        target,
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
   }
+
+  return results;
 }
 
 async function handleLeadMessage(event: HookEvent) {
@@ -276,7 +423,7 @@ async function handleLeadMessage(event: HookEvent) {
     return;
   }
 
-  let forwardedMedia: string[] = [];
+  let forwardedMedia: ForwardedMedia[] = [];
   let mediaForwardError = "";
 
   try {
@@ -293,13 +440,18 @@ async function handleLeadMessage(event: HookEvent) {
       conversationId: String(context.conversationId || ""),
       messageId: String(context.messageId || ""),
     },
-    media: forwardedMedia,
+    media: forwardedMedia.map((item) => item.storedPath),
     mediaForwardError: mediaForwardError || undefined,
+    normalized: buildNormalizedPayload(lead, event, forwardedMedia),
   };
 
+  const integrationDispatch = await postToN8n(payload);
+
   await ensureDir(crmDir());
-  await appendJsonl(path.join(crmDir(), "lead-registry.jsonl"), payload);
-  await postToN8n(payload);
+  await appendJsonl(path.join(crmDir(), "lead-registry.jsonl"), {
+    ...payload,
+    integrationDispatch,
+  });
 }
 
 const handler = async (event: HookEvent) => {
