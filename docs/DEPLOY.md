@@ -9,6 +9,7 @@ Guia pensada para un VPS Linux con OpenClaw y `n8n`.
 - OpenClaw instalado por usuario dedicado
 - `n8n` en el mismo VPS o accesible por red
 - `systemd` para mantener el gateway arriba
+- `Twenty` opcional pero recomendado como CRM hub
 
 ## Layout sugerido
 
@@ -42,20 +43,33 @@ Copiar desde este repo:
 Tomar como base:
 
 - [`../config/openclaw.example.json`](../config/openclaw.example.json)
+- [`../config/openclaw.gemini-fallback.example.json`](../config/openclaw.gemini-fallback.example.json) para un deploy con `google/gemini-2.5-flash` y fallback a `openai/gpt-5.4-mini`
 
 Completar especialmente:
 
+- `env.GEMINI_API_KEY`
+- `env.OPENAI_API_KEY`
 - `gateway.auth.token`
 - `hooks.internal.entries.lead-crm.env.LEAD_DESTINATION`
 - `hooks.internal.entries.lead-crm.env.N8N_WEBHOOK_URL`
+- `hooks.internal.entries.lead-crm.env.CRM_FANOUT_WEBHOOK_URLS`
 
 ### 4. Importar el workflow de n8n
 
-Importar:
+Importar como workflow canonico:
 
-- [`../workflows/n8n/galfredev-leads.workflow.json`](../workflows/n8n/galfredev-leads.workflow.json)
+- [`../workflows/n8n/galfredev-master-hub.workflow.json`](../workflows/n8n/galfredev-master-hub.workflow.json)
 
 Y dejarlo activo o publicado.
+
+El master hub ya contempla:
+
+- alta de `Company`, `Person` y `Opportunity` en `Twenty` via GraphQL
+- append operativo en `Google Sheets`
+- alta complementaria en `Notion`
+- alerta interna via `Gmail`
+
+Los workflows `galfredev-crm-hub` y `galfredev-twenty-forward` quedan disponibles solo como referencia o migracion incremental.
 
 ### 5. Enlazar WhatsApp
 
@@ -84,6 +98,7 @@ sudo systemctl start openclaw-galfre.service
 systemctl status openclaw-galfre.service
 journalctl -u openclaw-galfre.service -n 100 --no-pager
 openclaw channels status
+openclaw models status
 openclaw channels login --channel whatsapp
 openclaw channels logout --channel whatsapp
 ```
@@ -98,6 +113,15 @@ Despues del deploy:
 4. probar un lead real
 5. probar audio o imagen
 6. confirmar que el webhook de `n8n` recibe el lead
+7. confirmar que `n8n` puede reenviar a `Twenty` si corresponde
+
+## Recomendacion operativa sobre auth
+
+Para bots productivos o vendibles:
+
+- preferi API keys de proveedor
+- evita depender de OAuth personal como unica credencial
+- separa staging y produccion
 
 ## Notas de seguridad
 

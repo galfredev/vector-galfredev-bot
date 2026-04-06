@@ -1,5 +1,6 @@
 .openclaw/
 .codex-stage/
+.playwright-cli/
 
 # Local env and secrets
 .env
@@ -33,6 +34,19 @@ workspace/leads/
 *.log
 *.tmp
 *.bak
+output/
+
+# Local debugging / live setup artifacts
+cookies.txt
+tmp_n8n_cookies.txt
+current_n8n_workflow*.json
+master_payload*.json
+master_test_response*.txt
+patched_n8n_workflow_payload.json
+tmp_pw_*
+scripts/apply_n8n_patch_chunks.ps1
+scripts/patch_n8n_vector_workflow.ps1
+workflows/n8n/*-import*.json
 
 # Node / editor
 node_modules/

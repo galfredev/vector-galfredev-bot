@@ -1,0 +1,450 @@
+{
+  "name": "GalfreDev Master Hub",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "galfredev-twenty-forward",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        16
+      ],
+      "id": "bdf2eb2e-a494-494b-a64d-f27fa9cae028",
+      "name": "Webhook",
+      "webhookId": "galfredev-twenty-forward"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.TWENTY_GRAPHQL_URL || (($env.TWENTY_BASE_URL || '').replace(/\\/$/, '') + '/graphql')) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.TWENTY_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "mutation($data: CompanyCreateInput!){ createCompany(data:$data){ id name } }"
+            },
+            {
+              "name": "variables",
+              "value": "={{ { data: { name: $node[\"Webhook\"].json.body.normalized.company.displayName || \"Sin nombre\" } } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "b214507b-7241-4867-882f-7110ef6bf11b",
+      "name": "Twenty Create Company"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.TWENTY_GRAPHQL_URL || (($env.TWENTY_BASE_URL || '').replace(/\\/$/, '') + '/graphql')) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.TWENTY_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "mutation($data: PersonCreateInput!){ createPerson(data:$data){ id name { firstName lastName } company { id name } } }"
+            },
+            {
+              "name": "variables",
+              "value": "={{ { data: { name: { firstName: $node[\"Webhook\"].json.body.normalized.person.name || \"Sin nombre\" }, companyId: $node[\"Twenty Create Company\"].json.data.createCompany.id } } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "6a7e9182-78b5-4f0e-b7b8-1f671e06c001",
+      "name": "Twenty Create Person"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.TWENTY_GRAPHQL_URL || (($env.TWENTY_BASE_URL || '').replace(/\\/$/, '') + '/graphql')) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.TWENTY_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "mutation($data: OpportunityCreateInput!){ createOpportunity(data:$data){ id name stage } }"
+            },
+            {
+              "name": "variables",
+              "value": "={{ { data: { name: $node[\"Webhook\"].json.body.normalized.opportunity.title || \"Oportunidad sin titulo\", stage: \"SCREENING\", companyId: $node[\"Twenty Create Company\"].json.data.createCompany.id, pointOfContactId: $node[\"Twenty Create Person\"].json.data.createPerson.id } } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "54d8a0a5-e8b7-46e3-a7b1-8540d1722002",
+      "name": "Twenty Create Opportunity"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NeQxBBYXNH9CZqdpjOn_95Y0n4RAymkgkcbsk3d4OBs",
+          "mode": "list",
+          "cachedResultName": "Vector Leads v1.0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NeQxBBYXNH9CZqdpjOn_95Y0n4RAymkgkcbsk3d4OBs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NeQxBBYXNH9CZqdpjOn_95Y0n4RAymkgkcbsk3d4OBs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "createdAt": "={{ $node[\"Webhook\"].json.body.normalized.source.occurredAt || $now }}",
+            "name": "={{ $node[\"Webhook\"].json.body.normalized.person.name || '' }}",
+            "whatsappDigits": "={{ $node[\"Webhook\"].json.body.normalized.person.whatsappDigits || '' }}",
+            "openChat": "={{ $node[\"Webhook\"].json.body.normalized.person.openChat || '' }}",
+            "company": "={{ $node[\"Webhook\"].json.body.normalized.company.displayName || '' }}",
+            "opportunityTitle": "={{ $node[\"Webhook\"].json.body.normalized.opportunity.title || '' }}",
+            "stage": "={{ $node[\"Webhook\"].json.body.normalized.opportunity.stage || '' }}",
+            "status": "={{ $node[\"Webhook\"].json.body.normalized.opportunity.status || '' }}",
+            "summary": "={{ $node[\"Webhook\"].json.body.normalized.opportunity.summary || '' }}",
+            "currentProcess": "={{ $node[\"Webhook\"].json.body.normalized.opportunity.currentProcess || '' }}",
+            "desiredProcess": "={{ $node[\"Webhook\"].json.body.normalized.opportunity.desiredProcess || '' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "createdAt",
+              "displayName": "createdAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "whatsappDigits",
+              "displayName": "whatsappDigits",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "openChat",
+              "displayName": "openChat",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "opportunityTitle",
+              "displayName": "opportunityTitle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "stage",
+              "displayName": "stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currentProcess",
+              "displayName": "currentProcess",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "desiredProcess",
+              "displayName": "desiredProcess",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        832,
+        0
+      ],
+      "id": "62b50d51-a92c-440c-85bb-1ec307f46e99",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "331fb360-34af-808f-93e9-f871369bf13e",
+          "mode": "list",
+          "cachedResultName": "Vector Leads",
+          "cachedResultUrl": "https://www.notion.so/331fb36034af808f93e9f871369bf13e"
+        },
+        "title": "={{ $node[\"Webhook\"].json.body.normalized.opportunity.title || ($node[\"Webhook\"].json.body.normalized.person.name ? `Lead ${$node[\"Webhook\"].json.body.normalized.person.name}` : \"Lead Vector\") }}",
+        "propertiesUi": {
+          "propertyValues": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "48fe79e8-5860-47bb-a00a-e4416c6a46a7",
+      "name": "Create Notion lead",
+      "credentials": {
+        "notionApi": {
+          "name": "Notion Vector"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.GMAIL_INTERNAL_ALERT_TO || 'galfredev@gmail.com' }}",
+        "subject": "={{ `Lead Vector: ${$node[\"Webhook\"].json.body.normalized.company.displayName || $node[\"Webhook\"].json.body.normalized.person.name || \"Nuevo lead\"}` }}",
+        "message": "={{ `Nombre: ${$node[\"Webhook\"].json.body.normalized.person.name || \"-\"}\\nEmpresa: ${$node[\"Webhook\"].json.body.normalized.company.displayName || \"-\"}\\nWhatsApp: ${$node[\"Webhook\"].json.body.normalized.person.whatsappDigits || \"-\"}\\nEtapa: ${$node[\"Webhook\"].json.body.normalized.opportunity.stage || \"-\"}\\nEstado: ${$node[\"Webhook\"].json.body.normalized.opportunity.status || \"-\"}\\nResumen: ${$node[\"Webhook\"].json.body.normalized.opportunity.summary || \"-\"}\\nProceso actual: ${$node[\"Webhook\"].json.body.normalized.opportunity.currentProcess || \"-\"}\\nProceso deseado: ${$node[\"Webhook\"].json.body.normalized.opportunity.desiredProcess || \"-\"}\\nChat: ${$node[\"Webhook\"].json.body.normalized.person.openChat || \"-\"}` }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1248,
+        0
+      ],
+      "id": "95dd02f5-3ecf-4f7b-93c9-b11683d98bc1",
+      "name": "Send internal Gmail alert",
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "OK",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1456,
+        0
+      ],
+      "id": "04f196c3-78c5-4ef8-9a4d-ca6b0e6f02f1",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Twenty Create Company",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twenty Create Company": {
+      "main": [
+        [
+          {
+            "node": "Twenty Create Person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twenty Create Person": {
+      "main": [
+        [
+          {
+            "node": "Twenty Create Opportunity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twenty Create Opportunity": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Create Notion lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Notion lead": {
+      "main": [
+        [
+          {
+            "node": "Send internal Gmail alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send internal Gmail alert": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "versionId": "galfredev-master-hub-v2",
+  "active": true
+}

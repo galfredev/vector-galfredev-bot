@@ -1,0 +1,81 @@
+{
+  "createdAt": "2026-03-27T18:00:00.000Z",
+  "lead": {
+    "title": "Nuevo lead GalfreDev",
+    "name": "Ana Perez",
+    "whatsapp": "+5491112345678",
+    "whatsappDigits": "5491112345678",
+    "openChat": "https://wa.me/5491112345678",
+    "business": "Clinica Delta",
+    "need": "Automatizar turnos y seguimiento de pacientes",
+    "currentProcess": "Lo hacen por WhatsApp manual",
+    "desiredProcess": "Quieren automatizar respuestas y agenda",
+    "status": "Calificado",
+    "raw": "Nuevo lead GalfreDev\nNombre: Ana Perez\nNecesidad: Automatizar turnos y seguimiento de pacientes\nEstado: Calificado"
+  },
+  "delivery": {
+    "to": "+5493571606142",
+    "conversationId": "conv-123",
+    "messageId": "msg-123"
+  },
+  "media": [
+    "/tmp/lead-media/1711651200000-fachada-clinica.jpg"
+  ],
+  "normalized": {
+    "schemaVersion": "crm-hub.v1",
+    "source": {
+      "bot": "Vector",
+      "brand": "GalfreDev",
+      "channel": "whatsapp",
+      "sourceKey": "5491112345678",
+      "conversationId": "conv-123",
+      "messageId": "msg-123",
+      "occurredAt": "2026-03-27T18:00:00.000Z"
+    },
+    "person": {
+      "name": "Ana Perez",
+      "whatsapp": "+5491112345678",
+      "whatsappDigits": "5491112345678",
+      "openChat": "https://wa.me/5491112345678",
+      "senderName": "Ana"
+    },
+    "company": {
+      "name": "Clinica Delta",
+      "displayName": "Clinica Delta"
+    },
+    "opportunity": {
+      "title": "Automatizar turnos y seguimiento de pacientes - Clinica Delta",
+      "stage": "qualified",
+      "status": "Calificado",
+      "summary": "Automatizar turnos y seguimiento de pacientes",
+      "currentProcess": "Lo hacen por WhatsApp manual",
+      "desiredProcess": "Quieren automatizar respuestas y agenda",
+      "source": "whatsapp",
+      "owner": "Valentino"
+    },
+    "note": {
+      "title": "Nuevo lead GalfreDev",
+      "body": "Nuevo lead GalfreDev\nNombre: Ana Perez\nNecesidad: Automatizar turnos y seguimiento de pacientes\nEstado: Calificado"
+    },
+    "attachments": [
+      {
+        "storedPath": "/tmp/lead-media/1711651200000-fachada-clinica.jpg",
+        "kind": "forwarded-media",
+        "mediaType": "image/jpeg",
+        "description": "Foto del frente del negocio enviada por el lead",
+        "timestamp": "2026-03-27T17:59:30.000Z",
+        "isImage": true
+      }
+    ],
+    "syncHints": {
+      "suggestedSystems": ["twenty", "notion", "google-sheets"],
+      "gmailThreadRecommended": true,
+      "createTaskRecommended": true,
+      "attachmentCount": 1,
+      "hasAttachments": true,
+      "hasImageAttachments": true,
+      "hasDocumentAttachments": false,
+      "imageUnderstandingRecommended": true
+    }
+  }
+}

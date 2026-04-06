@@ -17,10 +17,25 @@ Esta guia resume que hace hoy Vector y que componentes sostienen la operacion pr
   - estado
 - registra el lead en `crm/lead-registry.jsonl`
 - envia webhook de intake a `n8n`
+- emite un payload normalizado apto para CRM Hub
 - usa audios como contexto comercial cuando hay transcripcion disponible
 - usa imagenes, capturas, PDFs y documentos como contexto comercial
 - reenvia adjuntos relevantes al handoff interno cuando corresponde
 - cierra la conversacion del cliente con link directo a Valentino
+
+## CRM Hub
+
+La nueva capa de CRM Hub esta pensada para mantener el bot igual de estable, pero mejor conectado.
+
+Rol de cada pieza:
+
+- `OpenClaw`: conversacion, clasificacion y handoff
+- hook `lead-crm`: normalizacion de payload y persistencia local
+- `n8n`: orquestacion entre sistemas
+- `Twenty`: CRM central y fuente de verdad estructurada
+- `Notion`: conocimiento reutilizable, SOPs y resumentes
+- `Google Sheets`: reporting y vistas operativas
+- `Gmail`: alertas internas y follow-up saliente controlado
 
 ## Audio e ingreso de adjuntos
 
@@ -109,8 +124,13 @@ Antes de considerar un deploy como cerrado, conviene probar:
 4. una aprobacion de propuesta por WhatsApp
 5. un `BRIEF` manual desde el chat de Valentino
 6. un `TEST AUDIO` desde el chat de Valentino
+7. una corrida de `n8n` recibiendo el bloque `normalized`
 
 ## Limites conocidos
 
 - que el bot este preparado para entender adjuntos no reemplaza una prueba end-to-end real
 - el sistema de mejora continua esta pensado para cambios acotados y gestionados, no para autoeditar toda la estrategia comercial sin supervision
+- la integracion con `Twenty`, `Notion`, `Sheets` o Gmail requiere definir credenciales y estructuras reales antes del deploy productivo
+- para `Gmail` conviene separar siempre:
+  - alertas internas
+  - correos salientes al lead

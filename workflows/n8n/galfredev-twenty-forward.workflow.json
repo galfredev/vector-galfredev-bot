@@ -1,0 +1,174 @@
+{
+  "name": "GalfreDev Twenty Forward",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "galfredev-twenty-forward",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "WebhookTwentyForwardIn",
+      "name": "Twenty Forward Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 320],
+      "webhookId": "galfredev-twenty-forward"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "has-twenty-webhook",
+              "leftValue": "={{ $env.TWENTY_WORKFLOW_WEBHOOK_URL || '' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "IfWebhookConfigured",
+      "name": "If Twenty Webhook Configured",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [520, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.TWENTY_WORKFLOW_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.normalized || $json }}",
+        "options": {}
+      },
+      "id": "PostToTwentyWorkflow",
+      "name": "Post To Twenty Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [780, 240]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "skip_reason",
+              "name": "skip_reason",
+              "value": "TWENTY_WORKFLOW_WEBHOOK_URL is empty",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "SetSkipReason",
+      "name": "Set Skip Reason",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [780, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, forwarded: true, twentyWorkflowUrlConfigured: true, twentyResult: $json } }}",
+        "options": {}
+      },
+      "id": "RespondForwarded",
+      "name": "Respond Forwarded",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1040, 240]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, forwarded: false, twentyWorkflowUrlConfigured: false, reason: $json.skip_reason } }}",
+        "options": {}
+      },
+      "id": "RespondSkipped",
+      "name": "Respond Skipped",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1040, 400]
+    }
+  ],
+  "connections": {
+    "Twenty Forward Webhook": {
+      "main": [
+        [
+          {
+            "node": "If Twenty Webhook Configured",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Twenty Webhook Configured": {
+      "main": [
+        [
+          {
+            "node": "Post To Twenty Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Skip Reason",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post To Twenty Workflow": {
+      "main": [
+        [
+          {
+            "node": "Respond Forwarded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Skip Reason": {
+      "main": [
+        [
+          {
+            "node": "Respond Skipped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  },
+  "pinData": {},
+  "meta": null,
+  "active": true,
+  "versionId": "galfredev-twenty-forward-v1",
+  "tags": []
+}

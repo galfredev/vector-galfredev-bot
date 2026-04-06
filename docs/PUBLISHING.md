@@ -16,10 +16,14 @@ Esta guia resume como compartir el proyecto sin exponer el runtime real del bot.
 
 - `.openclaw/`
 - `.codex-stage/`
+- `.playwright-cli/`
 - `config.env`
 - cualquier `openclaw.json` real
 - carpetas `credentials/`
 - `auth-profiles.json`
+- `cookies.txt`
+- snapshots de `n8n` como `current_n8n_workflow*.json`
+- payloads y respuestas de prueba (`master_payload*`, `master_test_response*`)
 - logs, media o leads reales
 
 ## Checklist previa al push

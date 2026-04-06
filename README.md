@@ -2,196 +2,179 @@
 
 Bot comercial de WhatsApp para GalfreDev, construido sobre OpenClaw.
 
-Este repositorio contiene la parte versionable del proyecto:
+Este repositorio guarda la parte versionable del proyecto:
 
-- identidad y prompts del agente
-- hook interno para CRM y reenvio de adjuntos relevantes
-- workflow de `n8n` para intake de leads
-- ejemplos de configuracion y despliegue
-- scripts de soporte
+- identidad, prompts y memoria del agente
+- hook interno de leads y handoff
+- workflows canonicos de `n8n`
+- scripts operativos y de validacion
+- configuraciones de ejemplo y documentacion de deploy
 
-No contiene el estado vivo del bot:
+No incluye el runtime vivo:
 
 - sesiones de WhatsApp
-- credenciales OAuth
-- tokens o secretos
+- credenciales OAuth o API keys reales
 - runtime state de OpenClaw
-- logs, media y leads reales de produccion
+- logs, media ni leads reales
 
-## Que hace este bot
+## Estado actual
 
-Vector es el asistente comercial de GalfreDev en WhatsApp.
+Perfil productivo recomendado y validado:
 
-Su objetivo es:
+- modelo principal: `google/gemini-2.5-flash`
+- fallback: `openai/gpt-5.4-mini`
+- canal principal: WhatsApp
+- gateway: OpenClaw sobre `systemd`
+- intake y CRM: `n8n` + `Twenty`
 
-- responder de forma natural y profesional
-- entender rapidamente la necesidad del lead
-- detectar si el caso encaja con lo que vende GalfreDev
-- pedir el minimo contexto necesario
-- derivar a Valentino con un resumen claro
-- registrar el lead y notificarlo via `n8n`
+El repo ya esta orientado a usar API keys de proveedor para produccion y evitar depender de OAuth personal.
 
-Tambien esta preparado para:
+## Que hace el bot
 
-- transcribir audios con `whisper.cpp` via CLI local
-- entender imagenes y documentos relevantes
-- reenviar adjuntos utiles al handoff interno
-- mejorar de forma supervisada con propuestas por WhatsApp
-- operar un canal interno con Valentino para brief, estado y audio
-- cerrar la conversacion del cliente sin dejarla abrupta
+Vector atiende leads comerciales por WhatsApp.
 
-## Stack
+Flujo principal:
 
-- OpenClaw
-- WhatsApp
-- OpenAI `gpt-5.4`
-- `n8n`
-- TypeScript
-- PowerShell
-- Linux `systemd` para produccion
+1. recibe un lead
+2. responde en tono profesional y breve
+3. detecta si el caso encaja con automatizacion, software, IA o integraciones
+4. pide el minimo contexto util
+5. resume la necesidad
+6. deriva a Valentino
+7. registra el lead y dispara el webhook a `n8n`
+
+Capacidades relevantes:
+
+- entiende texto, audios, imagenes y documentos como contexto comercial
+- reenvia adjuntos utiles al handoff interno
+- genera payload normalizado para CRM Hub
+- opera un canal interno de owner por WhatsApp
+- soporta mejora continua supervisada
 
 ## Arquitectura
 
 ```mermaid
 flowchart LR
   A["Cliente en WhatsApp"] --> B["Vector / OpenClaw"]
-  B --> C["Prompts en workspace/"]
-  B --> D["Hook lead-crm"]
-  D --> E["Webhook de n8n"]
-  D --> F["Handoff interno a Valentino"]
-  D --> G["Cache / reenvio de adjuntos"]
+  B --> C["workspace/"]
+  B --> D["hook lead-crm"]
+  D --> E["n8n master hub"]
+  E --> F["Twenty"]
+  E --> G["Notion / Sheets / Gmail"]
+  D --> H["Handoff interno a Valentino"]
 ```
 
-Mas detalle en [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
+Mas detalle:
 
-## Estructura del repo
+- [ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+- [OPERATIONS.md](./docs/OPERATIONS.md)
 
-- [workspace/](./workspace/): identidad, prompts, memoria y reglas del agente
-- [hooks/lead-crm/](./hooks/lead-crm/): hook que registra leads y reenvia adjuntos
-- [scripts/](./scripts/): utilidades de soporte, como export de leads
-- [workflows/n8n/](./workflows/n8n/): workflow de intake para `n8n`
-- [config/](./config/): configuracion de ejemplo de OpenClaw
-- [deploy/](./deploy/): templates de despliegue
-- [docs/](./docs/): documentacion operativa y de publicacion
+## Estructura
 
-## Archivos clave
+- [workspace/](./workspace/): identidad, prompts y reglas del agente
+- [hooks/lead-crm/](./hooks/lead-crm/): hook de intake, payload y handoff
+- [workflows/n8n/](./workflows/n8n/): workflows canonicos soportados
+- [scripts/](./scripts/): validaciones y utilidades operativas
+- [config/](./config/): configuraciones de ejemplo
+- [deploy/](./deploy/): templates de servicio y timers
+- [docs/](./docs/): runbooks, setup y estrategia
 
-- [workspace/AGENTS.md](./workspace/AGENTS.md)
-- [workspace/MEMORY.md](./workspace/MEMORY.md)
-- [hooks/lead-crm/handler.ts](./hooks/lead-crm/handler.ts)
+## Config recomendada
+
+Base recomendada para produccion nueva:
+
+- [config/openclaw.gemini-fallback.example.json](./config/openclaw.gemini-fallback.example.json)
+
+Base minimal alternativa:
+
 - [config/openclaw.example.json](./config/openclaw.example.json)
-- [workflows/n8n/galfredev-leads.workflow.json](./workflows/n8n/galfredev-leads.workflow.json)
-- [docs/OPERATIONS.md](./docs/OPERATIONS.md)
-- [docs/BOT-SUMMARY.md](./docs/BOT-SUMMARY.md)
 
-## Instalacion rapida
+Variables relevantes:
 
-Resumen corto:
+- `GEMINI_API_KEY`
+- `OPENAI_API_KEY`
+- `LEAD_DESTINATION`
+- `N8N_WEBHOOK_URL`
+- `CRM_FANOUT_WEBHOOK_URLS`
+- `TWENTY_BASE_URL`
+- `TWENTY_API_KEY`
+- `gateway.auth.token`
 
-1. Instalar OpenClaw en el servidor.
+Ejemplo de entorno:
+
+- [.env.example](./.env.example)
+
+## Setup rapido
+
+1. Instalar OpenClaw en el VPS.
 2. Copiar `workspace/` a `~/.openclaw/workspace/`.
 3. Copiar `hooks/lead-crm/` a `~/.openclaw/hooks/lead-crm/`.
-4. Crear `~/.openclaw/openclaw.json` a partir de `config/openclaw.example.json`.
-5. Configurar destino de leads, webhook de `n8n` y token del gateway.
-6. Importar el workflow de `n8n`.
-7. Relinkear WhatsApp.
-8. Levantar OpenClaw como servicio.
+4. Crear `~/.openclaw/openclaw.json` desde una config de ejemplo.
+5. Cargar API keys y variables reales.
+6. Importar el workflow canonico de `n8n`.
+7. Vincular WhatsApp.
+8. Levantar `openclaw-galfre.service`.
 
-Guia paso a paso:
+Guias:
 
-- [docs/QUICKSTART.md](./docs/QUICKSTART.md)
-- [docs/DEPLOY.md](./docs/DEPLOY.md)
+- [QUICKSTART.md](./docs/QUICKSTART.md)
+- [DEPLOY.md](./docs/DEPLOY.md)
+- [TESTING.md](./docs/TESTING.md)
 
-## Flujo comercial
+## Validacion local
 
-El flujo esperado del bot es:
+```bash
+npm install
+npm run check
+npm run check:bot
+npm run validate:crm-payload -- ./docs/examples/sample-lead-payload.json
+```
 
-1. Saludo inicial como asistente de GalfreDev.
-2. Calificacion rapida del lead.
-3. Una o pocas preguntas utiles si falta contexto.
-4. Resumen corto de la necesidad.
-5. Handoff a Valentino.
-6. Nota interna del lead.
-7. Registro del lead en CRM.
+Que valida cada comando:
+
+- `npm run check`: TypeScript y workflows canonicos
+- `npm run check:bot`: coherencia del runtime local de OpenClaw
+- `npm run validate:crm-payload`: payload ejemplo de lead
+
+## Operacion en produccion
+
+Puntos operativos importantes:
+
+- usar API keys de proveedor en vez de OAuth humano
+- dejar `google/gemini-2.5-flash` como primary y `openai/gpt-5.4-mini` como fallback
+- monitorear `openclaw models status`, `openclaw channels status` y el webhook de `n8n`
+- probar audio, imagen y lead completo despues de cada cambio relevante
+
+Runbooks utiles:
+
+- [OPENCLAW-AUTH-RUNBOOK.md](./docs/OPENCLAW-AUTH-RUNBOOK.md)
+- [STEP-BY-STEP-GEMINI-CUTOVER.md](./docs/STEP-BY-STEP-GEMINI-CUTOVER.md)
+- [GEMINI-FLASH-2.5-INTEGRATION-PLAN.md](./docs/GEMINI-FLASH-2.5-INTEGRATION-PLAN.md)
+- [LLM-STRATEGY.md](./docs/LLM-STRATEGY.md)
 
 ## Seguridad
 
-Este repo esta preparado para publicarse sin exponer secretos, pero igual conviene revisar siempre:
+Antes de subir cambios:
 
-- no subir `openclaw.json` real
-- no subir `credentials/`
-- no subir `auth-profiles.json`
-- no subir leads reales ni media real
-- no subir `.openclaw/` ni `.codex-stage/`
+- no commitear `.openclaw/`
+- no commitear `credentials/`, `auth-profiles.json` ni `models.json`
+- no commitear logs, media ni leads reales
+- no commitear `.env` reales ni tokens
 
-Ver tambien:
+Referencias:
 
-- [docs/PUBLISHING.md](./docs/PUBLISHING.md)
 - [.gitignore](./.gitignore)
+- [PUBLISHING.md](./docs/PUBLISHING.md)
 
-## Estado de produccion
+## Documentacion clave
 
-La version productiva actual corre en un VPS Linux con:
-
-- OpenClaw como servicio `systemd`
-- WhatsApp enlazado al servidor
-- `gpt-5.4` como modelo principal
-- webhook hacia `n8n`
-
-Este repositorio representa la parte limpia y mantenible del proyecto, no el runtime real.
-
-## Scripts utiles
-
-Export de leads desde sesiones locales:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\export-leads.ps1
-```
-
-Wrappers de transcripcion local:
-
-- `scripts/openclaw-whisper-stt.ps1`
-- `scripts/openclaw-whisper-stt.sh`
-
-Automatizacion de mejora continua:
-
-- `scripts/vector-improvement-analyze.mjs`
-- `scripts/vector-improvement-check-approval.mjs`
-- `scripts/vector-improvement-apply.mjs`
-
-Owner ops:
-
-- `scripts/vector-owner-brief.mjs`
-- `scripts/vector-owner-control-check.mjs`
-
-## Publicacion en GitHub
-
-Este repo ya fue saneado para compartirse.
-
-Si queres replicar el flujo en otro proyecto:
-
-1. dejar solo archivos versionables
-2. agregar `openclaw.example.json`
-3. excluir credenciales y runtime
-4. documentar deploy y operacion
-
-## Documentacion adicional
-
-- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
-- [docs/QUICKSTART.md](./docs/QUICKSTART.md)
-- [docs/DEPLOY.md](./docs/DEPLOY.md)
-- [docs/ELEVENLABS-CRON-PLAN.md](./docs/ELEVENLABS-CRON-PLAN.md)
-- [docs/BOT-SUMMARY.md](./docs/BOT-SUMMARY.md)
-- [docs/OPERATIONS.md](./docs/OPERATIONS.md)
-- [docs/TESTING.md](./docs/TESTING.md)
-- [docs/PUBLISHING.md](./docs/PUBLISHING.md)
-- [CONTRIBUTING.md](./CONTRIBUTING.md)
+- [BOT-SUMMARY.md](./docs/BOT-SUMMARY.md)
+- [OPERATIONS.md](./docs/OPERATIONS.md)
+- [TWENTY-CRM-HUB.md](./docs/TWENTY-CRM-HUB.md)
+- [MASTER-FLOW.md](./docs/MASTER-FLOW.md)
+- [LIVE-SETUP-CHECKLIST.md](./docs/LIVE-SETUP-CHECKLIST.md)
+- [ENGINEER-HANDOFF.md](./docs/ENGINEER-HANDOFF.md)
 
 ## Licencia
 
 MIT. Ver [LICENSE](./LICENSE).
-
-## Notas
-
-- El contenido del `workspace/` esta en espanol porque el bot fue disenado para atencion comercial en ese idioma.
-- El hook `lead-crm` asume una integracion simple con `n8n`, pero puede adaptarse a otros CRMs.

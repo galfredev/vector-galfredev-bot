@@ -110,6 +110,8 @@ Esperado:
 
 ```bash
 openclaw channels status
+openclaw models status
+npm run check:bot
 ```
 
 Esperado:
@@ -117,6 +119,8 @@ Esperado:
 - WhatsApp `linked`
 - WhatsApp `running`
 - WhatsApp `connected`
+- provider principal autenticado
+- sin warnings criticos de auth o hook
 
 ## Servicio systemd
 

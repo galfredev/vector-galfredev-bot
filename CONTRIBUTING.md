@@ -29,10 +29,12 @@ Se aceptan mejoras sobre:
 3. Mantener `config/openclaw.example.json` como ejemplo saneado.
 4. Si cambias el comportamiento del agente, actualiza tambien `workspace/`.
 5. Si cambias deploy o setup, actualiza `docs/`.
+6. Si cambias hooks o workflows, corre las validaciones locales.
 
 ## Checklist antes de abrir un cambio
 
 - revisar `git status`
+- correr `npm run check`
 - correr una prueba basica del flujo comercial
 - validar que el lead siga cerrando bien
 - validar que `.gitignore` no se rompio
