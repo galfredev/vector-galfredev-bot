@@ -2,6 +2,10 @@
 
 Esta guia resume como validar que el bot este funcionando bien despues de cambios o despliegues.
 
+Si queres la version completa de QA con pruebas para romper el bot, criterio de salida a produccion y fallback, mirar:
+
+- [QA-TEST-PLAN.md](./QA-TEST-PLAN.md)
+
 ## Objetivo
 
 Verificar 3 cosas:
@@ -14,6 +18,22 @@ Y ahora tambien:
 
 4. que el canal interno con Valentino funcione
 5. que el brief y el audio interno lleguen bien
+
+## Orden recomendado
+
+1. smoke tecnico
+2. saludo y flujo comercial basico
+3. lead completo con handoff
+4. audio
+5. imagen o documento
+6. webhook y registro
+7. comandos del owner
+8. pruebas de estres o casos para romperlo
+
+Configuracion recomendada para QA y produccion:
+
+- dejar `channels.whatsapp.debounceMs` en `1800` o similar para agrupar mensajes cortos seguidos
+- evitar `debounceMs: 0` salvo pruebas muy puntuales
 
 ## Casos minimos recomendados
 
@@ -147,6 +167,10 @@ Revisar:
 - cierre vacio al cliente
 - webhook de `n8n` caido
 - numeros o links mal formados en el lead
+- prompt injection o mensajes fuera de alcance que saquen al bot de rol
+- mensajes muy seguidos que generen respuestas duplicadas
+- adjuntos poco claros que hagan que el bot invente contexto
+- `debounceMs` en `0` que haga responder mensaje por mensaje y duplique interacciones
 
 ## Pruebas rapidas del owner
 

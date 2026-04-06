@@ -108,7 +108,7 @@
       ],
       "selfChatMode": true,
       "groupPolicy": "allowlist",
-      "debounceMs": 0,
+      "debounceMs": 1800,
       "mediaMaxMb": 50
     }
   },

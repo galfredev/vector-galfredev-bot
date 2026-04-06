@@ -104,6 +104,12 @@ async function main() {
     );
   }
 
+  if (typeof whatsapp.debounceMs !== "number" || whatsapp.debounceMs <= 0) {
+    warnings.push(
+      "WhatsApp debounceMs is 0 or missing. Short bursts of user messages can trigger multiple fragmented replies.",
+    );
+  }
+
   if (Array.isArray(whatsapp.allowFrom) && !whatsapp.allowFrom.includes("*")) {
     failures.push("WhatsApp allowFrom is restricted in config and does not include '*'.");
   }

@@ -120,6 +120,7 @@ Guias:
 - [QUICKSTART.md](./docs/QUICKSTART.md)
 - [DEPLOY.md](./docs/DEPLOY.md)
 - [TESTING.md](./docs/TESTING.md)
+- [QA-TEST-PLAN.md](./docs/QA-TEST-PLAN.md)
 
 ## Validacion local
 
