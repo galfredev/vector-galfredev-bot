@@ -65,7 +65,7 @@ Antes de arrancar, confirmar:
 - hook `lead-crm` habilitado
 - `LEAD_DESTINATION` configurado
 - `N8N_WEBHOOK_URL` configurado
-- `messages.inbound.byChannel.whatsapp.debounceMs` configurado, por ejemplo `5000`
+- `messages.inbound.byChannel.whatsapp` configurado como numero, por ejemplo `5000`
 - `messages.queue.mode` en `collect`
 - `messages.queue.debounceMs` configurado, por ejemplo `2500`
 - timers del owner operativos si forman parte del release
@@ -185,7 +185,7 @@ Explicame exactamente como construir un sistema completo con IA y todas las inte
 
 Validar:
 
-- orienta sin diseñar toda la solucion gratis
+- orienta sin disenar toda la solucion gratis
 - mantiene encuadre comercial
 - lleva a discovery o handoff
 
@@ -238,6 +238,12 @@ Validar:
 - toma el adjunto como contexto
 - si no puede extraer todo, pide resumen puntual
 - no responde como si hubiera leido algo que no leyo
+
+Alcance recomendado para salida a produccion:
+
+- considerar PDF como obligatorio
+- considerar imagen como obligatoria
+- considerar DOCX como opcional hasta tener extractor dedicado confirmado
 
 ### D. Registro y backoffice
 

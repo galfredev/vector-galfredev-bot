@@ -32,7 +32,7 @@ Y ahora tambien:
 
 Configuracion recomendada para QA y produccion:
 
-- usar `messages.inbound.byChannel.whatsapp.debounceMs` para agrupar mensajes cortos seguidos
+- usar `messages.inbound.byChannel.whatsapp` como numero en milisegundos para agrupar mensajes cortos seguidos
 - usar `messages.queue.mode: "collect"` con `messages.queue.debounceMs` para juntar follow-ups que llegan mientras el bot esta procesando
 - evitar depender de `channels.whatsapp.debounceMs` como unica defensa contra mensajes fragmentados
 
@@ -118,6 +118,13 @@ Enviar:
 - captura de un proceso
 - PDF de requerimiento
 - imagen relacionada con el problema
+
+Nota:
+
+- para QA productivo, probar PDF antes que DOCX
+- PDF tiene un camino de soporte mucho mas claro en OpenClaw
+- imagen y PDF deben validarse con `imageModel`, `pdfModel` y `tools.media.models` configurados en el runtime
+- DOCX hoy no debe considerarse criterio obligatorio de salida si no hay extractor dedicado en el runtime
 
 Esperado:
 

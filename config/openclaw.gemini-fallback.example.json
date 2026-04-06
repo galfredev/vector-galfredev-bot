@@ -14,6 +14,18 @@
           "openai/gpt-5.4-mini"
         ]
       },
+      "imageModel": {
+        "primary": "google/gemini-2.5-flash",
+        "fallbacks": [
+          "openai/gpt-5.4-mini"
+        ]
+      },
+      "pdfModel": {
+        "primary": "google/gemini-2.5-flash",
+        "fallbacks": [
+          "openai/gpt-5.4-mini"
+        ]
+      },
       "models": {
         "google/gemini-2.5-flash": {},
         "openai/gpt-5.4-mini": {}
@@ -54,6 +66,15 @@
       "workspaceOnly": true
     },
     "media": {
+      "models": [
+        {
+          "provider": "google",
+          "model": "gemini-2.5-flash",
+          "capabilities": [
+            "image"
+          ]
+        }
+      ],
       "image": {
         "enabled": true,
         "maxBytes": 10485760,
@@ -93,9 +114,7 @@
   "messages": {
     "inbound": {
       "byChannel": {
-        "whatsapp": {
-          "debounceMs": 5000
-        }
+        "whatsapp": 5000
       }
     },
     "queue": {
