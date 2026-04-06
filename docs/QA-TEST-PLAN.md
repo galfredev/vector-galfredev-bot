@@ -244,6 +244,7 @@ Alcance recomendado para salida a produccion:
 - considerar PDF como obligatorio
 - considerar imagen como obligatoria
 - considerar DOCX como opcional hasta tener extractor dedicado confirmado
+- si DOCX no esta soportado en el runtime, el comportamiento esperado es pedir PDF o un resumen util
 
 ### D. Registro y backoffice
 

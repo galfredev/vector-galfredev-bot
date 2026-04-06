@@ -125,6 +125,7 @@ Nota:
 - PDF tiene un camino de soporte mucho mas claro en OpenClaw
 - imagen y PDF deben validarse con `imageModel`, `pdfModel` y `tools.media.models` configurados en el runtime
 - DOCX hoy no debe considerarse criterio obligatorio de salida si no hay extractor dedicado en el runtime
+- si un cliente envia Word u otro formato no soportado, el bot debe pedir PDF o texto pegado, no quedarse en un "no puedo acceder"
 
 Esperado:
 
