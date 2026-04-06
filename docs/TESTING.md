@@ -32,8 +32,9 @@ Y ahora tambien:
 
 Configuracion recomendada para QA y produccion:
 
-- dejar `channels.whatsapp.debounceMs` en `1800` o similar para agrupar mensajes cortos seguidos
-- evitar `debounceMs: 0` salvo pruebas muy puntuales
+- usar `messages.inbound.byChannel.whatsapp.debounceMs` para agrupar mensajes cortos seguidos
+- usar `messages.queue.mode: "collect"` con `messages.queue.debounceMs` para juntar follow-ups que llegan mientras el bot esta procesando
+- evitar depender de `channels.whatsapp.debounceMs` como unica defensa contra mensajes fragmentados
 
 ## Casos minimos recomendados
 
@@ -170,7 +171,7 @@ Revisar:
 - prompt injection o mensajes fuera de alcance que saquen al bot de rol
 - mensajes muy seguidos que generen respuestas duplicadas
 - adjuntos poco claros que hagan que el bot invente contexto
-- `debounceMs` en `0` que haga responder mensaje por mensaje y duplique interacciones
+- falta de `messages.inbound` o `messages.queue` que haga responder mensaje por mensaje y duplique interacciones
 
 ## Pruebas rapidas del owner
 

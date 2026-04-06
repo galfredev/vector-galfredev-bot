@@ -90,6 +90,19 @@
       }
     }
   },
+  "messages": {
+    "inbound": {
+      "byChannel": {
+        "whatsapp": {
+          "debounceMs": 5000
+        }
+      }
+    },
+    "queue": {
+      "mode": "collect",
+      "debounceMs": 2500
+    }
+  },
   "channels": {
     "whatsapp": {
       "enabled": true,
@@ -99,7 +112,6 @@
       ],
       "selfChatMode": true,
       "groupPolicy": "allowlist",
-      "debounceMs": 1800,
       "mediaMaxMb": 50
     }
   },

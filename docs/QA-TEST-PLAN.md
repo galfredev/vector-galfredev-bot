@@ -65,7 +65,9 @@ Antes de arrancar, confirmar:
 - hook `lead-crm` habilitado
 - `LEAD_DESTINATION` configurado
 - `N8N_WEBHOOK_URL` configurado
-- `channels.whatsapp.debounceMs` en un valor productivo, por ejemplo `1800`
+- `messages.inbound.byChannel.whatsapp.debounceMs` configurado, por ejemplo `5000`
+- `messages.queue.mode` en `collect`
+- `messages.queue.debounceMs` configurado, por ejemplo `2500`
 - timers del owner operativos si forman parte del release
 
 Comandos utiles:

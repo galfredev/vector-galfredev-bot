@@ -99,20 +99,18 @@
   "session": {
     "dmScope": "per-channel-peer"
   },
-  "channels": {
-    "whatsapp": {
-      "enabled": true,
-      "dmPolicy": "open",
-      "allowFrom": [
-        "*"
-      ],
-      "selfChatMode": true,
-      "groupPolicy": "allowlist",
-      "debounceMs": 1800,
-      "mediaMaxMb": 50
-    }
-  },
   "messages": {
+    "inbound": {
+      "byChannel": {
+        "whatsapp": {
+          "debounceMs": 5000
+        }
+      }
+    },
+    "queue": {
+      "mode": "collect",
+      "debounceMs": 2500
+    },
     "tts": {
       "auto": "off",
       "provider": "microsoft",
@@ -124,6 +122,18 @@
         "rate": "-5%",
         "pitch": "-8%"
       }
+    }
+  },
+  "channels": {
+    "whatsapp": {
+      "enabled": true,
+      "dmPolicy": "open",
+      "allowFrom": [
+        "*"
+      ],
+      "selfChatMode": true,
+      "groupPolicy": "allowlist",
+      "mediaMaxMb": 50
     }
   },
   "hooks": {
