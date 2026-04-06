@@ -1,6 +1,6 @@
 {
   "meta": {
-    "lastTouchedVersion": "2026.3.24"
+    "lastTouchedVersion": "2026.3.23-1"
   },
   "env": {
     "GEMINI_API_KEY": "replace-with-gemini-api-key",
@@ -90,15 +90,6 @@
       }
     }
   },
-  "commands": {
-    "native": "auto",
-    "nativeSkills": "auto",
-    "restart": true,
-    "ownerDisplay": "raw"
-  },
-  "session": {
-    "dmScope": "per-channel-peer"
-  },
   "channels": {
     "whatsapp": {
       "enabled": true,
@@ -110,20 +101,6 @@
       "groupPolicy": "allowlist",
       "debounceMs": 0,
       "mediaMaxMb": 50
-    }
-  },
-  "messages": {
-    "tts": {
-      "auto": "off",
-      "provider": "microsoft",
-      "microsoft": {
-        "enabled": true,
-        "voice": "es-AR-TomasNeural",
-        "lang": "es-AR",
-        "outputFormat": "audio-24khz-48kbitrate-mono-mp3",
-        "rate": "-5%",
-        "pitch": "-8%"
-      }
     }
   },
   "hooks": {
@@ -153,30 +130,6 @@
     "tailscale": {
       "mode": "off",
       "resetOnExit": false
-    },
-    "nodes": {
-      "denyCommands": [
-        "camera.snap",
-        "camera.clip",
-        "screen.record",
-        "contacts.add",
-        "calendar.add",
-        "reminders.add",
-        "sms.send"
-      ]
     }
-  },
-  "skills": {
-    "entries": {
-      "openai-whisper-api": {
-        "apiKey": "replace-with-openai-api-key"
-      }
-    }
-  },
-  "plugins": {
-    "slots": {
-      "memory": "none"
-    },
-    "entries": {}
   }
 }

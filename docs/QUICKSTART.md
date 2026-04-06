@@ -23,6 +23,7 @@ Copia estas carpetas a tu instalacion real de OpenClaw:
 Usa este archivo como base:
 
 - [`config/openclaw.example.json`](../config/openclaw.example.json)
+- [`config/openclaw.gemini-fallback.example.json`](../config/openclaw.gemini-fallback.example.json) si queres ir directo a Gemini 2.5 Flash con fallback a OpenAI
 
 Guardalo como:
 
@@ -30,6 +31,8 @@ Guardalo como:
 
 Despues ajusta:
 
+- `GEMINI_API_KEY` o `GOOGLE_API_KEY` si vas a usar Gemini
+- `OPENAI_API_KEY` si queres fallback estable por API key
 - `LEAD_DESTINATION`
 - `N8N_WEBHOOK_URL`
 - `CRM_FANOUT_WEBHOOK_URLS` si queres espejar eventos
@@ -69,6 +72,7 @@ Validaciones utiles:
 
 ```bash
 npm run check
+npm run check:bot
 npm run validate:crm-payload -- path/to/payload.json
 ```
 
@@ -132,6 +136,20 @@ Revisar:
 - `N8N_WEBHOOK_URL`
 - logs del hook
 - que el workflow este publicado/activo
+
+### El bot no responde por auth vencido
+
+Si seguis con OAuth de Codex:
+
+```bash
+openclaw models auth login --provider openai-codex
+```
+
+Si queres una ruta mas estable para produccion:
+
+```bash
+openclaw onboard --auth-choice openai-api-key
+```
 
 ### El bot responde pero no reenvia adjuntos
 

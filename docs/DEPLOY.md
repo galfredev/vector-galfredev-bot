@@ -43,9 +43,12 @@ Copiar desde este repo:
 Tomar como base:
 
 - [`../config/openclaw.example.json`](../config/openclaw.example.json)
+- [`../config/openclaw.gemini-fallback.example.json`](../config/openclaw.gemini-fallback.example.json) para un deploy con `google/gemini-2.5-flash` y fallback a `openai/gpt-5.4-mini`
 
 Completar especialmente:
 
+- `env.GEMINI_API_KEY`
+- `env.OPENAI_API_KEY`
 - `gateway.auth.token`
 - `hooks.internal.entries.lead-crm.env.LEAD_DESTINATION`
 - `hooks.internal.entries.lead-crm.env.N8N_WEBHOOK_URL`
@@ -95,6 +98,7 @@ sudo systemctl start openclaw-galfre.service
 systemctl status openclaw-galfre.service
 journalctl -u openclaw-galfre.service -n 100 --no-pager
 openclaw channels status
+openclaw models status
 openclaw channels login --channel whatsapp
 openclaw channels logout --channel whatsapp
 ```
@@ -110,6 +114,14 @@ Despues del deploy:
 5. probar audio o imagen
 6. confirmar que el webhook de `n8n` recibe el lead
 7. confirmar que `n8n` puede reenviar a `Twenty` si corresponde
+
+## Recomendacion operativa sobre auth
+
+Para bots productivos o vendibles:
+
+- preferi API keys de proveedor
+- evita depender de OAuth personal como unica credencial
+- separa staging y produccion
 
 ## Notas de seguridad
 
