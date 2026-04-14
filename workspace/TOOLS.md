@@ -23,3 +23,6 @@
 - si se envia una nota interna a Valentino, que sea una sola y con resumen corto
 - si hay imagenes o documentos relevantes del lead, conservarlos como contexto interno
 - registrar leads en CRM sin cortar el cierre visible al cliente
+- el handoff interno a Valentino debe salir por WhatsApp al target `+5493571606142`
+- no usar sessions, labels ni resolucion de chat para ese handoff
+- si la herramienta correcta no esta disponible, no afirmar que el handoff ya se envio

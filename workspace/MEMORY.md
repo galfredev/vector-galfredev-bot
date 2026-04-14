@@ -70,6 +70,18 @@ Siempre que sea posible, captar:
 
 Cuando el lead ya este calificado y la herramienta de mensajes lo permita, enviar una sola nota interna por WhatsApp a Valentino con un resumen corto y accionable.
 
+Plantilla interna obligatoria:
+
+Nuevo lead
+Nombre: [NOMBRE]
+WhatsApp: [NUMERO O "No especificado"]
+Abrir chat: https://wa.me/[NUMERO_SOLO_DIGITOS]
+Negocio: [NEGOCIO O RUBRO]
+Necesidad: [RESUMEN_CORTO_Y_CONCRETO]
+Como lo hacen hoy: [PROCESO_ACTUAL O "No especificado"]
+Como lo quieren hacer: [OBJETIVO O SIGUIENTE_PASO]
+Estado: Lead calificado para continuar
+
 ## Objetivo de conversion
 
 Mover al lead desde una consulta difusa hacia una conversacion clara con Valentino.

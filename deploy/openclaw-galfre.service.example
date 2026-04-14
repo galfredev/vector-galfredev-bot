@@ -1,17 +1,26 @@
 [Unit]
 Description=OpenClaw Gateway for GalfreDev
-After=network-online.target docker.service
+After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
 User=openclaw
-WorkingDirectory=/opt/galfre-bot
+WorkingDirectory=/opt/galfre-bot/openclaw
 Environment=HOME=/opt/galfre-bot
 Environment=PATH=/opt/galfre-bot/.local/bin:/usr/local/bin:/usr/bin:/bin
-ExecStart=/opt/galfre-bot/.local/bin/openclaw gateway
+EnvironmentFile=-/opt/galfre-bot/openclaw/.env.production
+Environment=VECTOR_GATEWAY_PORT=18789
+ExecStart=/opt/galfre-bot/.local/bin/openclaw gateway --port 18789
 Restart=always
 RestartSec=5
+TimeoutStartSec=60
+TimeoutStopSec=30
+KillMode=mixed
+StartLimitIntervalSec=300
+StartLimitBurst=20
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
