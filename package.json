@@ -12,6 +12,8 @@
     "validate:workflows": "node ./scripts/validate-workflows.mjs",
     "validate:crm-payload": "node ./scripts/validate-crm-payload.mjs",
     "check:bot": "node ./scripts/check-bot-runtime.mjs",
+    "audit:runtime": "node ./scripts/openclaw-runtime-audit.mjs",
+    "render:production-config": "node ./scripts/render-production-config.mjs",
     "check": "npm run typecheck && npm run validate:workflows"
   },
   "devDependencies": {

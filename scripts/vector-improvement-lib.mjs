@@ -83,6 +83,10 @@ export function serviceName() {
   return env("VECTOR_SERVICE_NAME", "openclaw-galfre.service");
 }
 
+export function gatewayPort() {
+  return env("VECTOR_GATEWAY_PORT", "18789");
+}
+
 export function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
 }
@@ -190,6 +194,15 @@ export function runCommand(command, args, options = {}) {
   };
 }
 
+export function runOpenClawCommand(args, options = {}) {
+  const bin = openClawBin();
+  if (process.platform === "win32") {
+    return runCommand(bin, args, options);
+  }
+
+  return runCommand("sudo", ["-u", openClawUser(), "-H", bin, ...args], options);
+}
+
 export function sendWhatsAppMessage(message) {
   const target = approverNumber();
   const user = openClawUser();
@@ -215,6 +228,10 @@ export function restartService() {
   if (result.status !== 0) {
     throw new Error(result.stderr || `Failed to restart ${serviceName()}`);
   }
+}
+
+export function sleepMs(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
 
 export function formatProposalMessage(proposal) {

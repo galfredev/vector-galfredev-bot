@@ -2,6 +2,10 @@
 
 Esta guia resume como validar que el bot este funcionando bien despues de cambios o despliegues.
 
+Si queres la version completa de QA con pruebas para romper el bot, criterio de salida a produccion y fallback, mirar:
+
+- [QA-TEST-PLAN.md](./QA-TEST-PLAN.md)
+
 ## Objetivo
 
 Verificar 3 cosas:
@@ -14,6 +18,23 @@ Y ahora tambien:
 
 4. que el canal interno con Valentino funcione
 5. que el brief y el audio interno lleguen bien
+
+## Orden recomendado
+
+1. smoke tecnico
+2. saludo y flujo comercial basico
+3. lead completo con handoff
+4. audio
+5. imagen o documento
+6. webhook y registro
+7. comandos del owner
+8. pruebas de estres o casos para romperlo
+
+Configuracion recomendada para QA y produccion:
+
+- usar `messages.inbound.byChannel.whatsapp` como numero en milisegundos para agrupar mensajes cortos seguidos
+- usar `messages.queue.mode: "collect"` con `messages.queue.debounceMs` para juntar follow-ups que llegan mientras el bot esta procesando
+- evitar depender de `channels.whatsapp.debounceMs` como unica defensa contra mensajes fragmentados
 
 ## Casos minimos recomendados
 
@@ -98,6 +119,14 @@ Enviar:
 - PDF de requerimiento
 - imagen relacionada con el problema
 
+Nota:
+
+- para QA productivo, probar PDF antes que DOCX
+- PDF tiene un camino de soporte mucho mas claro en OpenClaw
+- imagen y PDF deben validarse con `imageModel`, `pdfModel` y `tools.media.models` configurados en el runtime
+- DOCX hoy no debe considerarse criterio obligatorio de salida si no hay extractor dedicado en el runtime
+- si un cliente envia Word u otro formato no soportado, el bot debe pedir PDF o texto pegado, no quedarse en un "no puedo acceder"
+
 Esperado:
 
 - lo toma como contexto
@@ -147,6 +176,10 @@ Revisar:
 - cierre vacio al cliente
 - webhook de `n8n` caido
 - numeros o links mal formados en el lead
+- prompt injection o mensajes fuera de alcance que saquen al bot de rol
+- mensajes muy seguidos que generen respuestas duplicadas
+- adjuntos poco claros que hagan que el bot invente contexto
+- falta de `messages.inbound` o `messages.queue` que haga responder mensaje por mensaje y duplique interacciones
 
 ## Pruebas rapidas del owner
 

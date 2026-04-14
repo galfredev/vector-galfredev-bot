@@ -117,13 +117,43 @@ function parseLead(content: string) {
     whatsapp,
     whatsappDigits: normalizeDigits(whatsapp || openChat),
     openChat,
-    business: readField("Negocio", "Rubro"),
+    business: readField("Negocio", "Rubro", "Empresa"),
     need: readField("Necesidad"),
     currentProcess: readField("Como lo hacen hoy", "Cómo lo hacen hoy"),
     desiredProcess: readField("Como lo quieren hacer", "Cómo lo quieren hacer", "Objetivo"),
     status: readField("Estado"),
     raw: content,
   };
+}
+
+function looksLikeLeadHandoff(content: string) {
+  const normalized = normalizeText(content);
+  if (!normalized) return false;
+
+  const hasLeadTitle = /nuevo lead/i.test(content);
+  const hasName = /nombre:/i.test(content);
+  const hasNeed = /necesidad:/i.test(content);
+  const hasStatus = /estado:/i.test(content);
+  const hasBusiness = /(negocio|rubro|empresa):/i.test(content);
+  const hasWhatsapp = /whatsapp:/i.test(content);
+  const hasOpenChat = /abrir chat:/i.test(content);
+  const hasCurrentProcess = /(como lo hacen hoy|c[óo]mo lo hacen hoy):/i.test(content);
+
+  if (hasLeadTitle && hasName && hasNeed && hasStatus) {
+    return true;
+  }
+
+  const structuredFieldScore = [
+    hasName,
+    hasNeed,
+    hasStatus,
+    hasBusiness,
+    hasWhatsapp,
+    hasOpenChat,
+    hasCurrentProcess,
+  ].filter(Boolean).length;
+
+  return structuredFieldScore >= 5;
 }
 
 function opportunityTitleFromLead(lead: ReturnType<typeof parseLead>) {
@@ -408,11 +438,7 @@ async function handleLeadMessage(event: HookEvent) {
   const occurredAt = eventTimestamp(event.timestamp);
   const destinationDigits = normalizeDigits(process.env.LEAD_DESTINATION || "+5493571606142");
   const toDigits = normalizeDigits(String(context.to || ""));
-  const looksLikeLead =
-    /nuevo lead/i.test(content) &&
-    /nombre:/i.test(content) &&
-    /necesidad:/i.test(content) &&
-    /estado:/i.test(content);
+  const looksLikeLead = looksLikeLeadHandoff(content);
 
   if (channelId !== "whatsapp" || !success) return;
   if (destinationDigits && toDigits && destinationDigits !== toDigits) return;

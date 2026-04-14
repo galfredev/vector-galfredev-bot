@@ -85,6 +85,12 @@ async function main() {
   const envProviders = getProvidersFromEnvObject(config?.env);
 
   const whatsapp = config?.channels?.whatsapp ?? {};
+  const inboundDebounceMs =
+    config?.messages?.inbound?.byChannel?.whatsapp?.debounceMs ??
+    config?.messages?.inbound?.debounceMs ??
+    null;
+  const queueMode = config?.messages?.queue?.mode ?? null;
+  const queueDebounceMs = config?.messages?.queue?.debounceMs ?? null;
   const primaryModel = config?.agents?.defaults?.model?.primary ?? null;
   const fallbackModels = Array.isArray(config?.agents?.defaults?.model?.fallbacks)
     ? config.agents.defaults.model.fallbacks
@@ -101,6 +107,24 @@ async function main() {
   if (whatsapp.dmPolicy !== "open") {
     failures.push(
       `WhatsApp dmPolicy is '${String(whatsapp.dmPolicy)}' instead of 'open'. New leads can be blocked.`,
+    );
+  }
+
+  if (typeof inboundDebounceMs !== "number" || inboundDebounceMs <= 0) {
+    warnings.push(
+      "messages.inbound.byChannel.whatsapp.debounceMs is 0 or missing. Short bursts of user messages can trigger fragmented replies.",
+    );
+  }
+
+  if (queueMode !== "collect") {
+    warnings.push(
+      "messages.queue.mode is not 'collect'. Follow-up messages that arrive while the bot is processing can fragment into multiple replies.",
+    );
+  }
+
+  if (queueMode === "collect" && (typeof queueDebounceMs !== "number" || queueDebounceMs <= 0)) {
+    warnings.push(
+      "messages.queue.debounceMs is 0 or missing while queue collect mode is enabled.",
     );
   }
 
@@ -169,6 +193,8 @@ async function main() {
     `Fallbacks: ${fallbackModels.length > 0 ? fallbackModels.join(", ") : "-"}`,
   );
   notes.push(`WhatsApp dmPolicy: ${String(whatsapp.dmPolicy ?? "missing")}`);
+  notes.push(`WhatsApp inbound debounce: ${String(inboundDebounceMs ?? "missing")}`);
+  notes.push(`Message queue: ${String(queueMode ?? "missing")} / debounce ${String(queueDebounceMs ?? "missing")}`);
   notes.push(
     `Hook lead-crm: ${hookConfig?.enabled ? "enabled" : "disabled"}${hookEnv.N8N_WEBHOOK_URL ? " / webhook configured" : ""}`,
   );

@@ -120,6 +120,7 @@ Guias:
 - [QUICKSTART.md](./docs/QUICKSTART.md)
 - [DEPLOY.md](./docs/DEPLOY.md)
 - [TESTING.md](./docs/TESTING.md)
+- [QA-TEST-PLAN.md](./docs/QA-TEST-PLAN.md)
 
 ## Validacion local
 
@@ -142,8 +143,9 @@ Puntos operativos importantes:
 
 - usar API keys de proveedor en vez de OAuth humano
 - dejar `google/gemini-2.5-flash` como primary y `openai/gpt-5.4-mini` como fallback
+- definir `imageModel`, `pdfModel` y `tools.media.models` en el runtime si queres que imagenes y PDFs entren como contexto de verdad
 - monitorear `openclaw models status`, `openclaw channels status` y el webhook de `n8n`
-- probar audio, imagen y lead completo despues de cada cambio relevante
+- probar audio, imagen, PDF y lead completo despues de cada cambio relevante
 
 Runbooks utiles:
 
