@@ -1,9 +1,22 @@
-import { appendFile, copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { appendFile, copyFile, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { createHash } from "node:crypto";
 
 const execFileAsync = promisify(execFile);
+
+// --- Seguridad: validacion de media reenviada + anti-flood/dedup de leads ---
+const MAX_FORWARD_BYTES = 16 * 1024 * 1024; // 16 MB: no reenviar archivos gigantes al telefono de Valentino
+const ALLOWED_FORWARD_PREFIXES = ["image/", "audio/", "application/pdf"];
+const LEAD_DEDUP_WINDOW_MS = 10 * 60 * 1000; // mismo lead no se re-ingesta dentro de 10 min
+const LEAD_RATE_WINDOW_MS = 60 * 60 * 1000; // ventana de rate-limit: 1 hora
+const LEAD_RATE_MAX = 25; // tope de leads procesados por hora (anti-flood)
+
+function isForwardableMedia(mediaType: string, sizeBytes: number) {
+  if (sizeBytes <= 0 || sizeBytes > MAX_FORWARD_BYTES) return false;
+  return ALLOWED_FORWARD_PREFIXES.some((prefix) => (mediaType || "").startsWith(prefix));
+}
 
 type HookEvent = {
   type: string;
@@ -40,6 +53,44 @@ type ForwardedMedia = {
 };
 
 const SELF_NUMBERS = new Set(["5493571606142", "5493571606142@s.whatsapp.net"]);
+
+function leadGuardFile() {
+  return path.join(crmDir(), "lead-guard.json");
+}
+
+function leadDedupKey(lead: { whatsappDigits: string; need: string }) {
+  const need = (lead.need || "").replace(/\s+/g, " ").trim().toLowerCase().slice(0, 80);
+  const hash = createHash("sha256").update(need).digest("hex").slice(0, 12);
+  return `${lead.whatsappDigits || "nonum"}:${hash}`;
+}
+
+// Devuelve false si el lead debe DESCARTARSE (duplicado reciente o sobre el tope horario).
+async function leadGuardAllows(key: string) {
+  let store: { recent: Record<string, number>; window: number[] };
+  try {
+    store = JSON.parse(await readFile(leadGuardFile(), "utf8"));
+  } catch {
+    store = { recent: {}, window: [] };
+  }
+  const now = Date.now();
+  for (const k of Object.keys(store.recent || {})) {
+    if (now - store.recent[k] > LEAD_DEDUP_WINDOW_MS) delete store.recent[k];
+  }
+  store.window = (store.window || []).filter((t) => now - t < LEAD_RATE_WINDOW_MS);
+
+  if (key && store.recent[key] && now - store.recent[key] < LEAD_DEDUP_WINDOW_MS) {
+    return false; // mismo lead repetido
+  }
+  if (store.window.length >= LEAD_RATE_MAX) {
+    return false; // demasiados leads en la ultima hora
+  }
+
+  store.recent[key || String(now)] = now;
+  store.window.push(now);
+  await ensureDir(crmDir());
+  await writeFile(leadGuardFile(), JSON.stringify(store), "utf8");
+  return true;
+}
 
 function homeDir() {
   return process.env.HOME || process.env.USERPROFILE || "";
@@ -354,6 +405,19 @@ async function forwardMediaIfAny(lead: ReturnType<typeof parseLead>) {
   const forwarded: ForwardedMedia[] = [];
 
   for (const item of pending.slice(0, 3)) {
+    // Seguridad: no reenviar al telefono de Valentino archivos de tipo no permitido o gigantes.
+    let sizeBytes = 0;
+    try {
+      sizeBytes = (await stat(item.storedPath)).size;
+    } catch {
+      item.forwarded = true; // archivo faltante: marcar y saltar
+      continue;
+    }
+    if (!isForwardableMedia(item.mediaType || "", sizeBytes)) {
+      item.forwarded = true; // tipo no permitido u oversized: no reenviar
+      continue;
+    }
+
     const caption = [
       "Adjunto relevante del lead de GalfreDev",
       lead.name ? `Nombre: ${lead.name}` : "",
@@ -446,6 +510,11 @@ async function handleLeadMessage(event: HookEvent) {
 
   const lead = parseLead(content);
   if (destinationDigits && lead.whatsappDigits && destinationDigits === lead.whatsappDigits) {
+    return;
+  }
+
+  // Seguridad anti-flood: descartar leads duplicados (mismo numero + necesidad) o por encima del tope horario.
+  if (!(await leadGuardAllows(leadDedupKey(lead)))) {
     return;
   }
 
