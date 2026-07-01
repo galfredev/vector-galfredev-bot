@@ -162,8 +162,12 @@ function parseLead(content: string) {
   const whatsapp = readField("WhatsApp");
   const openChat = readField("Abrir chat");
 
+  const brandRaw = readField("Marca", "Producto");
+  const brand = /pyron/i.test(brandRaw) ? "Pyron" : "GalfreDev";
+
   return {
     title: content.split("\n")[0]?.trim() || "Nuevo lead",
+    brand,
     name: readField("Nombre"),
     whatsapp,
     whatsappDigits: normalizeDigits(whatsapp || openChat),
@@ -256,7 +260,7 @@ function buildNormalizedPayload(
     schemaVersion: "crm-hub.v1",
     source: {
       bot: "Vector",
-      brand: "GalfreDev",
+      brand: lead.brand || "GalfreDev",
       channel: String(context.channelId || "whatsapp"),
       sourceKey,
       conversationId: String(context.conversationId || ""),
@@ -276,6 +280,7 @@ function buildNormalizedPayload(
     },
     opportunity: {
       title: opportunityTitleFromLead(lead),
+      product: lead.brand || "GalfreDev",
       stage: mapLeadStatusToStage(status),
       status: status || "Nuevo",
       summary: need,

@@ -38,6 +38,35 @@ Proyectos mostrados en la web:
 - SaaS Dashboard
 - Web Scraper & Analytics
 
+## Pyron (producto de GalfreDev)
+
+Pyron es un SaaS de GalfreDev para **empresas de matafuegos** (venta y recarga de extintores y articulos de seguridad contra incendios) en Argentina. Digitaliza un negocio que hoy se maneja con Excel, papel y memoria del dueño. Web: https://pyron.lat/
+
+Dolores del rubro que Pyron resuelve:
+
+- clientes y extintores anotados en Excel o agenda, sin control real
+- extintores que vencen sin avisarle al cliente (se pierde el cliente y la recarga)
+- facturar en AFIP a mano, lento y con errores
+- sin control de stock (polvo, repuestos, equipos)
+- sin metricas: cuanto facturan, quien les debe, que clientes rinden
+
+Que hace Pyron:
+
+- gestion de clientes finales (cliente -> sucursales -> sectores)
+- inventario de extintores con trazabilidad, QR propio + oblea oficial (CAFAREC, AGC)
+- ordenes de trabajo con calendario, asignacion a tecnicos, app en sitio, escaneo QR, foto y firma
+- stock multi-ubicacion (taller + vehiculos de los tecnicos)
+- documentos automaticos: orden de trabajo, remito, certificado con QR, factura AFIP
+- facturacion electronica AFIP nativa (Monotributo y Responsable Inscripto)
+- avisos automaticos de vencimiento por WhatsApp
+- suscripcion mensual, con planes segun el tamaño de la empresa
+
+Para quien: matafuegueras chicas y medianas que quieren dejar el papel, no perder clientes por vencimientos y profesionalizar (la norma IRAM 3517 los empuja a ordenar los registros).
+
+Precios: orientativos, NO dar exactos. Derivar a Valentino para ver plan y valores.
+
+Como calificar un lead de Pyron: ¿tienen una empresa de matafuegos?, ¿como llevan hoy los clientes y la facturacion (Excel, papel, otro sistema)?, tamaño aproximado (cuantos tecnicos / extintores / clientes). Con eso + nombre, derivar.
+
 ## Funcion del agente
 
 El agente no esta para resolver todo.
