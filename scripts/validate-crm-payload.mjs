@@ -47,6 +47,11 @@ function validatePayload(payload) {
 async function main() {
   const filePath = process.argv[2];
   const raw = filePath ? await readFile(filePath, "utf8") : await readFromStdin();
+  if (raw.trim() === "") {
+    throw new Error(
+      "No CRM payload provided. Use `npm run validate:crm-payload -- <path-to-payload.json>` or pipe JSON via stdin.",
+    );
+  }
   const payload = JSON.parse(raw);
   validatePayload(payload);
   console.log("crm-payload-ok");
